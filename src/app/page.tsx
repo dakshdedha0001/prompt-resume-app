@@ -29,9 +29,6 @@ export default function Home() {
   // Countdown Timer State (14 mins 45 seconds ticking down)
   const [timeLeft, setTimeLeft] = useState({ minutes: 14, seconds: 45 });
 
-  // FOMO Purchase Toast State
-  const [fomoToast, setFomoToast] = useState<{ name: string; city: string; time: string } | null>(null);
-
   // Lightbox Zoom Modal State
   const [lightboxImage, setLightboxImage] = useState<{
     src: string;
@@ -82,31 +79,11 @@ export default function Home() {
         } else if (prev.minutes > 0) {
           return { minutes: prev.minutes - 1, seconds: 59 };
         } else {
-          return { minutes: 14, seconds: 45 }; // Reset for continuous urgency
+          return { minutes: 14, seconds: 45 };
         }
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  // Live FOMO Toast Loop
-  useEffect(() => {
-    const notifications = [
-      { name: "Rahul S.", city: "Delhi", time: "2 mins ago" },
-      { name: "Priya V.", city: "Mumbai", time: "5 mins ago" },
-      { name: "Ankit K.", city: "Bengaluru", time: "1 min ago" },
-      { name: "Sneha M.", city: "Pune", time: "8 mins ago" },
-      { name: "Aman G.", city: "Hyderabad", time: "3 mins ago" },
-    ];
-
-    let idx = 0;
-    const interval = setInterval(() => {
-      setFomoToast(notifications[idx % notifications.length]);
-      idx++;
-      setTimeout(() => setFomoToast(null), 4000);
-    }, 11000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleChatSubmit = async (e: React.FormEvent) => {
@@ -188,30 +165,6 @@ export default function Home() {
     },
   ];
 
-  const testimonials = [
-    {
-      name: "Ankit Sharma",
-      role: "B.Tech Computer Science Fresher",
-      text: "I sent out 40+ resumes before and got zero callbacks. After applying Chapter 4 & 13 prompts from this toolkit, my resume score jumped and I landed 3 interviews in a week!",
-      rating: "⭐⭐⭐⭐⭐",
-      company: "Placed at TCS Digital",
-    },
-    {
-      name: "Priya Verma",
-      role: "MBA Marketing Candidate",
-      text: "The MBA leadership bullet points and LinkedIn headline prompts alone are worth 100x the ₹99 price! Highly recommended for all management grads.",
-      rating: "⭐⭐⭐⭐⭐",
-      company: "Interned at Deloitte",
-    },
-    {
-      name: "Rohan Gupta",
-      role: "Finance & B.Com Graduate",
-      text: "The 3 Word ATS templates are so clean and easy to edit in Word. The AI prompts written specifically for ChatGPT & Claude made writing my resume effortless.",
-      rating: "⭐⭐⭐⭐⭐",
-      company: "Placed at Genpact",
-    },
-  ];
-
   const faqs = [
     {
       q: "What is included in the ₹99 Prompt Resume Toolkit?",
@@ -243,7 +196,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-[#fafafa] text-[#111827] font-sans antialiased">
       {/* Top Urgency Banner Bar */}
       <div className="bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-md">
-        <span>⚡ HURRY UP! FLASH SALE IS LIVE:</span>
+        <span>⚡ FLASH SALE IS LIVE:</span>
         <span className="bg-black/30 px-2.5 py-0.5 rounded-md tracking-wider font-mono">
           {String(timeLeft.minutes).padStart(2, "0")}m : {String(timeLeft.seconds).padStart(2, "0")}s
         </span>
@@ -266,9 +219,6 @@ export default function Home() {
             </a>
             <a href="#pdf-preview" className="hover:text-black transition">
               Book Preview
-            </a>
-            <a href="#reviews" className="hover:text-black transition">
-              Reviews
             </a>
             <a href="#faq" className="hover:text-black transition">
               FAQ
@@ -299,7 +249,7 @@ export default function Home() {
 
             <button
               onClick={handleBuyClick}
-              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer animate-pulse"
+              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer"
             >
               Buy Now – ₹99
             </button>
@@ -339,13 +289,6 @@ export default function Home() {
               Book Preview
             </a>
             <a
-              href="#reviews"
-              onClick={() => setMobileMenuOpen(false)}
-              className="font-medium text-gray-800"
-            >
-              Reviews
-            </a>
-            <a
               href="#faq"
               onClick={() => setMobileMenuOpen(false)}
               className="font-medium text-gray-800"
@@ -383,11 +326,9 @@ export default function Home() {
       <section className="pt-12 pb-16 px-5 max-w-[1060px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-[#2563eb] px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider">
-              <span>⭐ 4.9/5 Rating</span>
-              <span>•</span>
-              <span>1,420+ Candidates Helped</span>
-            </div>
+            <span className="inline-block text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
+              AI-POWERED RESUME SYSTEM • 23 CHAPTERS • 30+ PROMPTS
+            </span>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
               Stop Guessing What Recruiters Want. Start Using the System That Gets You Interviews.
@@ -647,43 +588,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Student Reviews & Testimonials Section */}
-      <section id="reviews" className="py-14 px-5 bg-white border-y border-gray-200">
-        <div className="max-w-[1060px] mx-auto">
-          <div className="text-center max-w-xl mx-auto mb-10">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-              Student Success Stories
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-              Trusted by 1,400+ Freshers, MBAs & Candidates
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, idx) => (
-              <div
-                key={idx}
-                className="bg-[#fafafa] border border-gray-200 p-6 rounded-2xl shadow-xs flex flex-col justify-between"
-              >
-                <div>
-                  <div className="text-yellow-400 text-sm mb-2">{t.rating}</div>
-                  <p className="text-xs sm:text-sm text-gray-700 italic leading-relaxed mb-4">
-                    "{t.text}"
-                  </p>
-                </div>
-                <div className="border-t border-gray-200 pt-3">
-                  <strong className="block text-sm text-gray-900 font-bold">{t.name}</strong>
-                  <span className="block text-xs text-gray-500">{t.role}</span>
-                  <span className="inline-block bg-green-50 text-green-700 border border-green-200 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1.5">
-                    ✓ {t.company}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section id="faq" className="py-14 px-5 max-w-[680px] mx-auto w-full">
         <div className="text-center mb-8">
@@ -742,7 +646,7 @@ export default function Home() {
 
           <button
             onClick={handleBuyClick}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer animate-bounce"
+            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer"
           >
             ⚡ Get Instant Access – ₹99 Only
           </button>
@@ -810,24 +714,11 @@ export default function Home() {
         </div>
         <button
           onClick={handleBuyClick}
-          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer animate-pulse"
+          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer"
         >
           Buy Now – ₹99
         </button>
       </div>
-
-      {/* Live Social Proof Purchase Notification Toast */}
-      {fomoToast && (
-        <div className="fixed bottom-20 left-5 z-[9999] bg-white border border-gray-200 shadow-2xl rounded-xl p-3 flex items-center gap-3 animate-slideUp text-xs">
-          <span className="text-xl">🎉</span>
-          <div>
-            <strong className="block text-gray-900 font-bold">
-              {fomoToast.name} from {fomoToast.city}
-            </strong>
-            <span className="text-gray-500">Purchased Prompt Resume Toolkit ({fomoToast.time})</span>
-          </div>
-        </div>
-      )}
 
       {/* Floating Action Buttons Stack (WhatsApp + AI Chatbot) */}
       <div className="fixed bottom-5 right-5 z-[999] flex flex-col gap-3 items-center">
