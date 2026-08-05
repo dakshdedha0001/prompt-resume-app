@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'Ueprpc9buny3LfGRdzUqSK26';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'XSpjObO3u61C61LjB6GEuOwx';
 
     // Verify HMAC-SHA256 signature if razorpay details are provided
     if (razorpay_order_id && razorpay_payment_id && razorpay_signature) {

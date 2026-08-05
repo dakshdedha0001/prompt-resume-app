@@ -10,8 +10,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: Sign in required' }, { status: 401 });
     }
 
-    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMBEcvihyYT5Bi';
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'Ueprpc9buny3LfGRdzUqSK26';
+    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMBGmp5WcsBdZ2';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'XSpjObO3u61C61LjB6GEuOwx';
 
     const instance = new Razorpay({
       key_id,
