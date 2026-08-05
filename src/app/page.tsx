@@ -95,7 +95,7 @@ export default function Home() {
     setIsProcessingPayment(true);
 
     try {
-      // 1. Create order on backend API (/api/create-order)
+      // 1. Create order on backend API (/api/create-order) for ₹1 (100 paise)
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,16 +110,16 @@ export default function Home() {
       const keyId =
         orderData.key_id ||
         process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
-        "rzp_test_TMBEcvihyYT5Bi";
+        "rzp_test_TMBGmp5WcsBdZ2";
 
       // 2. Open Razorpay Standard Checkout Modal with order_id
       if (typeof window !== "undefined" && (window as any).Razorpay) {
         const options = {
           key: keyId,
-          amount: orderData.amount, // in paise (9900)
+          amount: orderData.amount, // 100 paise = ₹1
           currency: orderData.currency || "INR",
           name: "Prompt Resume",
-          description: "The AI Resume Blueprint & ATS Toolkit (₹99)",
+          description: "The AI Resume Blueprint & ATS Toolkit",
           image: "/favicon.ico",
           order_id: orderData.order_id, // Mandatory Razorpay Order ID
           prefill: {
