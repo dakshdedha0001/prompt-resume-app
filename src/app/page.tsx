@@ -67,17 +67,15 @@ export default function Home() {
     },
   ];
 
-  // Auto-redirect unpaid signed-in users immediately after account creation/sign in
+  // ALWAYS redirect ANY unpaid signed-in user immediately to Razorpay payment page
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const hasPaid =
         user.publicMetadata?.has_paid === true ||
         user.unsafeMetadata?.has_paid === true;
 
-      const shouldRedirect = sessionStorage.getItem("redirect_to_pay") === "true";
-
-      if (shouldRedirect && !hasPaid) {
-        sessionStorage.removeItem("redirect_to_pay");
+      // If user is signed in but HAS NOT paid yet, immediately forward them to Razorpay ₹99 payment!
+      if (!hasPaid) {
         window.location.href = "https://rzp.io/rzp/LVhAvNk";
       }
     }
@@ -147,7 +145,6 @@ export default function Home() {
   // Require Sign Up / Login before proceeding directly to Razorpay
   const handleBuyClick = () => {
     if (!isSignedIn) {
-      sessionStorage.setItem("redirect_to_pay", "true");
       openSignUp({
         fallbackRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
         forceRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
@@ -264,12 +261,20 @@ export default function Home() {
 
             {/* Clerk Auth Integration */}
             <Show when="signed-out">
-              <SignInButton mode="modal" forceRedirectUrl="https://rzp.io/rzp/LVhAvNk">
+              <SignInButton
+                mode="modal"
+                fallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+                forceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+              >
                 <button className="text-[#2563eb] font-semibold hover:underline cursor-pointer">
                   Sign In
                 </button>
               </SignInButton>
-              <SignUpButton mode="modal" forceRedirectUrl="https://rzp.io/rzp/LVhAvNk">
+              <SignUpButton
+                mode="modal"
+                fallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+                forceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+              >
                 <button className="bg-gray-100 text-gray-900 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-200 transition cursor-pointer">
                   Sign Up
                 </button>
@@ -334,7 +339,11 @@ export default function Home() {
               FAQ
             </a>
             <Show when="signed-out">
-              <SignInButton mode="modal" forceRedirectUrl="https://rzp.io/rzp/LVhAvNk">
+              <SignInButton
+                mode="modal"
+                fallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+                forceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+              >
                 <button className="text-left font-semibold text-[#2563eb]">
                   Sign In
                 </button>
@@ -837,7 +846,7 @@ export default function Home() {
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] p-3 rounded-xl text-xs leading-relaxed ${
+                  className={`max-w-[80%] p-[#2563eb] rounded-xl text-xs leading-relaxed ${
                     msg.sender === "user"
                       ? "bg-[#2563eb] text-white rounded-br-none"
                       : "bg-gray-100 text-gray-800 rounded-bl-none"
