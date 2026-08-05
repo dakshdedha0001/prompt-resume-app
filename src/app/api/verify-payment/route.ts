@@ -2,6 +2,33 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
+// Handle Razorpay Post-Payment Redirect (GET Request from Browser Redirect)
+export async function GET(req: Request) {
+  try {
+    const { userId } = await auth();
+    const url = new URL(req.url);
+
+    if (userId) {
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          has_paid: true,
+          paid_at: new Date().toISOString(),
+        },
+        unsafeMetadata: {
+          has_paid: true,
+        },
+      });
+    }
+
+    return NextResponse.redirect(new URL('/dashboard?paid=true', url.origin));
+  } catch (error: any) {
+    console.error('GET Verify Payment Error:', error);
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+}
+
+// Handle Server-to-Server or Verification API Calls (POST Request)
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
