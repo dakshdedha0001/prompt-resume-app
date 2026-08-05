@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ClerkProvider,
   SignInButton,
   SignUpButton,
   Show,
@@ -26,26 +25,36 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Lightbox Zoom Modal State
+  const [lightboxImage, setLightboxImage] = useState<{
+    src: string;
+    title: string;
+  } | null>(null);
+
   const productSlides = [
     {
       src: "/images/promptresume.png",
-      alt: "Prompt Resume Cover",
+      alt: "Prompt Resume Ebook Cover",
       badge: "Cover Shot",
+      title: "The AI Resume Blueprint — Book Cover",
     },
     {
       src: "/images/page_2.png",
-      alt: "Why This Book Exists",
+      alt: "Why This Book Exists — Page 02",
       badge: "Inside • Page 02",
+      title: "Page 02 — Why This Book Exists & How to Use Prompts",
     },
     {
       src: "/images/page_3.png",
       alt: "Table of Contents",
       badge: "Inside • Contents",
+      title: "Table of Contents — All 23 Chapters Overview",
     },
     {
       src: "/images/page_4.png",
-      alt: "Chapter 1 Prompt",
+      alt: "Chapter 1 Prompt Excerpt",
       badge: "Inside • Chapter 01",
+      title: "Chapter 01 — ATS Compatibility Checker Prompt Sheet",
     },
   ];
 
@@ -79,7 +88,7 @@ export default function Home() {
           ...prev,
           {
             sender: "bot",
-            text: "The Prompt Resume Toolkit includes 23 chapters & 30+ AI prompts for ₹99!",
+            text: "Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field — MBA, B.Tech, BBA, Finance, Marketing & Freshers. Get instant access for ₹99 today! 🚀",
           },
         ]);
       }
@@ -88,7 +97,7 @@ export default function Home() {
         ...prev,
         {
           sender: "bot",
-          text: "The Prompt Resume Toolkit includes 23 chapters & 30+ AI prompts for ₹99!",
+          text: "Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field — MBA, B.Tech, BBA, Finance, Marketing & Freshers. Get instant access for ₹99 today! 🚀",
         },
       ]);
     }
@@ -137,6 +146,9 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
             <a href="#whats-inside" className="hover:text-black transition">
               What's Inside
+            </a>
+            <a href="#pdf-preview" className="hover:text-black transition">
+              Book Preview
             </a>
             <a href="#faq" className="hover:text-black transition">
               FAQ
@@ -194,6 +206,13 @@ export default function Home() {
               className="font-medium text-gray-800"
             >
               What's Inside
+            </a>
+            <a
+              href="#pdf-preview"
+              onClick={() => setMobileMenuOpen(false)}
+              className="font-medium text-gray-800"
+            >
+              Book Preview
             </a>
             <a
               href="#faq"
@@ -269,10 +288,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Interactive Product Gallery Carousel */}
+          {/* Interactive Product Gallery Carousel with Zoom Feature */}
           <div className="lg:col-span-5 flex justify-center">
             <div className="w-full max-w-[340px] space-y-3">
-              <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-[#090d16]">
+              <div
+                onClick={() =>
+                  setLightboxImage({
+                    src: productSlides[activeSlide].src,
+                    title: productSlides[activeSlide].title,
+                  })
+                }
+                className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-[#090d16] cursor-pointer group"
+              >
                 {productSlides.map((slide, idx) => (
                   <div
                     key={idx}
@@ -284,12 +311,17 @@ export default function Home() {
                       src={slide.src}
                       alt={slide.alt}
                       fill
-                      className="object-contain p-2"
+                      className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                       priority={idx === 0}
                     />
                     <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-sky-400 text-[11px] font-bold px-2.5 py-1 rounded-full border border-sky-400/30">
                       {slide.badge}
                     </span>
+
+                    {/* Zoom Overlay Indicator */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[2px]">
+                      <span>🔍 Click to View Fullscreen</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -376,6 +408,51 @@ export default function Home() {
             <div className="text-3xl mb-3">📊</div>
             <h3 className="font-bold text-lg mb-1">7-Category HR Matrix</h3>
             <p className="text-sm text-gray-600">Audit your own resume against the exact scorecard HR recruiters use to screen candidates.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* PDF Screenshots Preview Section with Click-to-Zoom */}
+      <section id="pdf-preview" className="py-14 px-5 bg-white border-y border-gray-200">
+        <div className="max-w-[1060px] mx-auto">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
+              Inside The Blueprint
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
+              Sneak Peek Inside The 52-Page PDF Ebook
+            </h2>
+            <p className="text-sm text-gray-500 mt-2">
+              Click any page screenshot below to view it in full resolution.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {productSlides.map((slide, idx) => (
+              <div
+                key={idx}
+                onClick={() => setLightboxImage({ src: slide.src, title: slide.title })}
+                className="bg-gray-50 border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-lg transition cursor-pointer group"
+              >
+                <div className="relative h-64 w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-900 mb-3">
+                  <Image
+                    src={slide.src}
+                    alt={slide.alt}
+                    fill
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[2px]">
+                    <span>🔍 Click to Zoom</span>
+                  </div>
+                </div>
+                <div className="font-semibold text-xs text-gray-800 line-clamp-1">
+                  {slide.title}
+                </div>
+                <div className="text-[11px] text-[#2563eb] font-medium mt-0.5">
+                  Click to view high-res PDF →
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -491,6 +568,34 @@ export default function Home() {
           💬
         </button>
       </div>
+
+      {/* Fullscreen Lightbox Zoom Modal */}
+      {lightboxImage && (
+        <div
+          onClick={() => setLightboxImage(null)}
+          className="fixed inset-0 z-[100000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 cursor-zoom-out animate-fadeIn"
+        >
+          <div className="relative max-w-4xl w-full max-h-[90vh] h-full flex flex-col items-center justify-center">
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-2 right-2 sm:-top-10 sm:-right-10 text-white hover:text-gray-300 text-3xl font-bold z-50 p-2"
+            >
+              ✕
+            </button>
+            <div className="relative w-full h-full max-h-[80vh] rounded-xl overflow-hidden bg-gray-950 border border-gray-800 shadow-2xl">
+              <Image
+                src={lightboxImage.src}
+                alt={lightboxImage.title}
+                fill
+                className="object-contain p-2"
+              />
+            </div>
+            <div className="text-white text-xs sm:text-sm font-semibold mt-4 text-center bg-gray-900/80 px-4 py-2 rounded-full border border-gray-700">
+              {lightboxImage.title} • (Click anywhere to close)
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* AI Chat Window Overlay */}
       {chatOpen && (
