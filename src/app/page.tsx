@@ -13,7 +13,7 @@ import {
 } from "@clerk/nextjs";
 
 export default function Home() {
-  const { isSignedIn } = useUser();
+  const { user, isSignedIn } = useUser();
   const { openSignUp } = useClerk();
 
   const [activeSlide, setActiveSlide] = useState(0);
@@ -128,7 +128,7 @@ export default function Home() {
     }
   };
 
-  // Require Sign Up / Login before proceeding to Razorpay
+  // Require Sign Up / Login before proceeding directly to Razorpay
   const handleBuyClick = () => {
     if (!isSignedIn) {
       openSignUp({
@@ -239,12 +239,12 @@ export default function Home() {
 
             {/* Clerk Auth Integration */}
             <Show when="signed-out">
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" forceRedirectUrl="https://rzp.io/rzp/LVhAvNk">
                 <button className="text-[#2563eb] font-semibold hover:underline cursor-pointer">
                   Sign In
                 </button>
               </SignInButton>
-              <SignUpButton mode="modal">
+              <SignUpButton mode="modal" forceRedirectUrl="https://rzp.io/rzp/LVhAvNk">
                 <button className="bg-gray-100 text-gray-900 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-200 transition cursor-pointer">
                   Sign Up
                 </button>
@@ -309,7 +309,7 @@ export default function Home() {
               FAQ
             </a>
             <Show when="signed-out">
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" forceRedirectUrl="https://rzp.io/rzp/LVhAvNk">
                 <button className="text-left font-semibold text-[#2563eb]">
                   Sign In
                 </button>
@@ -501,7 +501,7 @@ export default function Home() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-3xl mb-3">📊</div>
+            <div className="text-[#2563eb] text-3xl mb-3">📊</div>
             <h3 className="font-bold text-lg mb-1">7-Category HR Matrix</h3>
             <p className="text-sm text-gray-600">Audit your own resume against the exact scorecard HR recruiters use to screen candidates.</p>
           </div>
