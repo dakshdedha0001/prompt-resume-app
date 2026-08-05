@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-bg: #fafafa;
+    --color-card: #ffffff;
+    --color-text-main: #111827;
+    --color-text-sub: #4b5563;
+    --color-text-muted: #9ca3af;
+    --color-btn-primary: #2563eb;
+    --color-btn-hover: #1d4ed8;
+    --color-border: #e5e7eb;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee-scroll 35s linear infinite;
+}
