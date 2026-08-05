@@ -67,18 +67,7 @@ export default function Home() {
     },
   ];
 
-  // Dynamically load Razorpay SDK Script
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  // Trigger Native Embedded Razorpay Modal / Payment Flow
+  // Trigger Razorpay Payment Redirect (100% Reliable Hosted Checkout)
   const triggerRazorpayCheckout = () => {
     const hasPaid =
       user?.publicMetadata?.has_paid === true ||
@@ -86,62 +75,12 @@ export default function Home() {
 
     if (hasPaid) {
       window.location.href = "/dashboard";
-      return;
+    } else {
+      window.location.href = "https://rzp.io/rzp/LVhAvNk";
     }
-
-    const keyId =
-      process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TM3BrAf8s2JN79";
-
-    // If Razorpay SDK is loaded, open native popup modal
-    if (typeof window !== "undefined" && (window as any).Razorpay && keyId) {
-      try {
-        const options = {
-          key: keyId,
-          amount: 9900, // ₹99 in paise
-          currency: "INR",
-          name: "Prompt Resume",
-          description: "The AI Resume Blueprint & ATS Toolkit (₹99)",
-          image: "/favicon.ico",
-          prefill: {
-            name: user?.fullName || user?.firstName || "",
-            email: user?.primaryEmailAddress?.emailAddress || "",
-          },
-          theme: {
-            color: "#2563eb",
-          },
-          handler: async function (response: any) {
-            try {
-              await fetch("/api/verify-payment", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  payment_id: response.razorpay_payment_id,
-                }),
-              });
-            } catch (e) {
-              console.error("Payment verification error:", e);
-            }
-            window.location.href = "/dashboard?paid=true";
-          },
-          modal: {
-            ondismiss: function () {
-              console.log("Payment checkout dismissed");
-            },
-          },
-        };
-        const rzp = new (window as any).Razorpay(options);
-        rzp.open();
-        return;
-      } catch (err) {
-        console.error("Razorpay popup error, falling back to hosted page:", err);
-      }
-    }
-
-    // Fallback to Razorpay Hosted Link
-    window.location.href = "https://rzp.io/rzp/LVhAvNk";
   };
 
-  // Auto-trigger Razorpay modal immediately after unpaid user completes Sign Up / Sign In
+  // Auto-trigger Razorpay payment immediately after unpaid user completes Sign Up / Sign In
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const hasPaid =
