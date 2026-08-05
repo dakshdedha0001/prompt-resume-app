@@ -26,6 +26,9 @@ export default function Home() {
   const [chatInput, setChatInput] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Countdown Timer State (14 mins 45 seconds ticking down)
+  const [timeLeft, setTimeLeft] = useState({ minutes: 14, seconds: 45 });
+
   // FOMO Purchase Toast State
   const [fomoToast, setFomoToast] = useState<{ name: string; city: string; time: string } | null>(null);
 
@@ -70,6 +73,22 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [productSlides.length]);
 
+  // Urgency Countdown Timer Effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { minutes: prev.minutes - 1, seconds: 59 };
+        } else {
+          return { minutes: 14, seconds: 45 }; // Reset for continuous urgency
+        }
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Live FOMO Toast Loop
   useEffect(() => {
     const notifications = [
@@ -85,7 +104,7 @@ export default function Home() {
       setFomoToast(notifications[idx % notifications.length]);
       idx++;
       setTimeout(() => setFomoToast(null), 4000);
-    }, 12000);
+    }, 11000);
 
     return () => clearInterval(interval);
   }, []);
@@ -222,6 +241,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafafa] text-[#111827] font-sans antialiased">
+      {/* Top Urgency Banner Bar */}
+      <div className="bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-md">
+        <span>⚡ HURRY UP! FLASH SALE IS LIVE:</span>
+        <span className="bg-black/30 px-2.5 py-0.5 rounded-md tracking-wider font-mono">
+          {String(timeLeft.minutes).padStart(2, "0")}m : {String(timeLeft.seconds).padStart(2, "0")}s
+        </span>
+        <span className="hidden md:inline">• 80% OFF (₹499 → ₹99 Only)</span>
+      </div>
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#fafafa]/90 backdrop-blur-md border-b border-[#e5e7eb]">
         <div className="max-w-[1060px] mx-auto px-5 h-16 flex items-center justify-between">
@@ -271,7 +299,7 @@ export default function Home() {
 
             <button
               onClick={handleBuyClick}
-              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer"
+              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer animate-pulse"
             >
               Buy Now – ₹99
             </button>
@@ -384,13 +412,17 @@ export default function Home() {
               Works with <strong className="text-gray-600">ChatGPT</strong> • <strong className="text-gray-600">Claude</strong> • <strong className="text-gray-600">Gemini</strong> • <strong className="text-gray-600">Grok</strong>
             </p>
 
-            <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+            <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center">
               <button
                 onClick={handleBuyClick}
-                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer"
+                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto"
               >
-                Get Instant Access – ₹99
+                Get Instant Access – ₹99 <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
               </button>
+
+              <div className="text-xs text-amber-700 font-extrabold flex items-center gap-1 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
+                <span>🔥 Only 7 copies left at ₹99!</span>
+              </div>
             </div>
 
             <div className="flex items-center justify-center lg:justify-start gap-4 pt-1 text-xs text-gray-500 font-medium">
@@ -466,13 +498,13 @@ export default function Home() {
         <div className="whitespace-nowrap flex gap-8 animate-marquee text-white text-sm font-semibold">
           <span>🚀 Stop Guessing What Recruiters Want</span>
           <span className="text-blue-500">•</span>
-          <span>⚡ 30+ Copyable AI Prompts Included</span>
+          <span>⚡ 80% OFF FLASH SALE — ₹99 ONLY (REGULAR ₹499)</span>
           <span className="text-blue-500">•</span>
           <span>📑 3 Word ATS Templates Ready</span>
           <span className="text-blue-500">•</span>
           <span>🎯 Works for MBA, Tech, Freshers & Experienced</span>
           <span className="text-blue-500">•</span>
-          <span>⭐ 67% OFF Launch Special — ₹99 Only</span>
+          <span>🔥 OFFER ENDS IN {String(timeLeft.minutes).padStart(2, "0")}m : {String(timeLeft.seconds).padStart(2, "0")}s</span>
         </div>
       </section>
 
@@ -692,32 +724,53 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Card Section */}
-      <section id="pricing" className="py-14 px-5 max-w-[440px] mx-auto w-full">
-        <div className="bg-white border-2 border-[#2563eb] rounded-2xl p-8 text-center shadow-xl relative overflow-hidden">
-          <div className="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest py-1 px-4 transform rotate-45 absolute top-3 -right-10 w-36 shadow-xs">
-            POPULAR
+      {/* Catchy High-Converting Pricing Card Section */}
+      <section id="pricing" className="py-14 px-5 max-w-[460px] mx-auto w-full">
+        <div className="bg-white border-2 border-[#2563eb] rounded-2xl p-8 text-center shadow-2xl relative overflow-hidden ring-4 ring-blue-500/10">
+          <div className="bg-[#2563eb] text-white text-[10px] font-black uppercase tracking-widest py-1.5 px-6 transform rotate-45 absolute top-4 -right-10 w-40 shadow-sm">
+            80% OFF
           </div>
 
-          <span className="inline-block bg-blue-50 text-[#2563eb] text-xs font-bold px-3.5 py-1 rounded-full mb-4 border border-blue-100">
-            ⚡ Launch Discount — 67% OFF
+          <span className="inline-block bg-red-50 text-red-600 text-xs font-extrabold px-3.5 py-1 rounded-full mb-4 border border-red-200">
+            🔥 FLASH SALE ENDS IN {String(timeLeft.minutes).padStart(2, "0")}:{String(timeLeft.seconds).padStart(2, "0")}
           </span>
 
-          <div className="flex items-baseline justify-center gap-3 mb-2">
+          <div className="flex items-baseline justify-center gap-3 mb-1">
             <span className="text-5xl font-black text-[#2563eb] tracking-tight">₹99</span>
-            <span className="text-lg text-gray-400 line-through font-medium">₹299</span>
+            <span className="text-xl text-gray-400 line-through font-bold">₹499</span>
           </div>
 
-          <p className="text-xs text-gray-500 font-medium mb-6">One-time purchase • Lifetime access • Free updates</p>
+          <p className="text-xs text-gray-500 font-medium mb-5">
+            Regular Price ₹499 • Launch Special ₹99 • Lifetime Access
+          </p>
 
           <button
             onClick={handleBuyClick}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-3.5 px-6 rounded-xl font-bold text-base w-full transition shadow-md hover:-translate-y-0.5 cursor-pointer"
+            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer animate-bounce"
           >
-            Get Instant Access – ₹99
+            ⚡ Get Instant Access – ₹99 Only
           </button>
 
-          <div className="flex items-center justify-center gap-4 mt-4 text-[11px] text-gray-500 font-medium">
+          <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-600 font-medium text-left">
+            <div className="flex items-center gap-2">
+              <span className="text-green-600 font-bold">✓</span>
+              <span>52-Page Ebook PDF (23 Chapters)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-green-600 font-bold">✓</span>
+              <span>30+ Copyable AI Prompt Sheets</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-green-600 font-bold">✓</span>
+              <span>3 Word ATS Templates (.docx)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-green-600 font-bold">✓</span>
+              <span>Instant Download & Student Dashboard</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-4 mt-5 text-[11px] text-gray-500 font-medium">
             <span>🔒 Secure Razorpay</span>
             <span>•</span>
             <span>⚡ Instant Delivery</span>
@@ -751,14 +804,17 @@ export default function Home() {
       {/* Mobile Sticky Bottom Buy Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-2.5 flex items-center justify-between shadow-2xl">
         <div>
-          <div className="text-[10px] text-gray-500 font-semibold uppercase">Launch Price</div>
+          <div className="text-[10px] text-red-600 font-extrabold uppercase flex items-center gap-1">
+            <span>🔥 80% OFF ENDS IN</span>
+            <span className="font-mono">{String(timeLeft.minutes).padStart(2, "0")}:{String(timeLeft.seconds).padStart(2, "0")}</span>
+          </div>
           <div className="text-base font-extrabold text-[#2563eb]">
-            ₹99 <span className="text-xs text-gray-400 line-through font-normal">₹299</span>
+            ₹99 <span className="text-xs text-gray-400 line-through font-normal">₹499</span>
           </div>
         </div>
         <button
           onClick={handleBuyClick}
-          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer"
+          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer animate-pulse"
         >
           Buy Now – ₹99
         </button>
