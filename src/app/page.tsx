@@ -67,16 +67,92 @@ export default function Home() {
     },
   ];
 
-  // ALWAYS redirect ANY unpaid signed-in user immediately to Razorpay payment page
+  // Dynamically load Razorpay SDK Script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  // Trigger Native Embedded Razorpay Modal / Payment Flow
+  const triggerRazorpayCheckout = () => {
+    const hasPaid =
+      user?.publicMetadata?.has_paid === true ||
+      user?.unsafeMetadata?.has_paid === true;
+
+    if (hasPaid) {
+      window.location.href = "/dashboard";
+      return;
+    }
+
+    const keyId =
+      process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TM3BrAf8s2JN79";
+
+    // If Razorpay SDK is loaded, open native popup modal
+    if (typeof window !== "undefined" && (window as any).Razorpay && keyId) {
+      try {
+        const options = {
+          key: keyId,
+          amount: 9900, // ₹99 in paise
+          currency: "INR",
+          name: "Prompt Resume",
+          description: "The AI Resume Blueprint & ATS Toolkit (₹99)",
+          image: "/favicon.ico",
+          prefill: {
+            name: user?.fullName || user?.firstName || "",
+            email: user?.primaryEmailAddress?.emailAddress || "",
+          },
+          theme: {
+            color: "#2563eb",
+          },
+          handler: async function (response: any) {
+            try {
+              await fetch("/api/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  payment_id: response.razorpay_payment_id,
+                }),
+              });
+            } catch (e) {
+              console.error("Payment verification error:", e);
+            }
+            window.location.href = "/dashboard?paid=true";
+          },
+          modal: {
+            ondismiss: function () {
+              console.log("Payment checkout dismissed");
+            },
+          },
+        };
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+        return;
+      } catch (err) {
+        console.error("Razorpay popup error, falling back to hosted page:", err);
+      }
+    }
+
+    // Fallback to Razorpay Hosted Link
+    window.location.href = "https://rzp.io/rzp/LVhAvNk";
+  };
+
+  // Auto-trigger Razorpay modal immediately after unpaid user completes Sign Up / Sign In
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const hasPaid =
         user.publicMetadata?.has_paid === true ||
         user.unsafeMetadata?.has_paid === true;
 
-      // If user is signed in but HAS NOT paid yet, immediately forward them to Razorpay ₹99 payment!
-      if (!hasPaid) {
-        window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      const justSignedUp = sessionStorage.getItem("pending_buy") === "true";
+
+      if (justSignedUp && !hasPaid) {
+        sessionStorage.removeItem("pending_buy");
+        triggerRazorpayCheckout();
       }
     }
   }, [isLoaded, isSignedIn, user]);
@@ -145,20 +221,13 @@ export default function Home() {
   // Require Sign Up / Login before proceeding directly to Razorpay
   const handleBuyClick = () => {
     if (!isSignedIn) {
+      sessionStorage.setItem("pending_buy", "true");
       openSignUp({
-        fallbackRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
-        forceRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
+        fallbackRedirectUrl: "/",
+        forceRedirectUrl: "/",
       });
     } else {
-      const hasPaid =
-        user?.publicMetadata?.has_paid === true ||
-        user?.unsafeMetadata?.has_paid === true;
-
-      if (hasPaid) {
-        window.location.href = "/dashboard";
-      } else {
-        window.location.href = "https://rzp.io/rzp/LVhAvNk";
-      }
+      triggerRazorpayCheckout();
     }
   };
 
@@ -261,20 +330,12 @@ export default function Home() {
 
             {/* Clerk Auth Integration */}
             <Show when="signed-out">
-              <SignInButton
-                mode="modal"
-                fallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-                forceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-              >
+              <SignInButton mode="modal">
                 <button className="text-[#2563eb] font-semibold hover:underline cursor-pointer">
                   Sign In
                 </button>
               </SignInButton>
-              <SignUpButton
-                mode="modal"
-                fallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-                forceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-              >
+              <SignUpButton mode="modal">
                 <button className="bg-gray-100 text-gray-900 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-200 transition cursor-pointer">
                   Sign Up
                 </button>
@@ -339,11 +400,7 @@ export default function Home() {
               FAQ
             </a>
             <Show when="signed-out">
-              <SignInButton
-                mode="modal"
-                fallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-                forceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-              >
+              <SignInButton mode="modal">
                 <button className="text-left font-semibold text-[#2563eb]">
                   Sign In
                 </button>
@@ -846,7 +903,7 @@ export default function Home() {
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] p-[#2563eb] rounded-xl text-xs leading-relaxed ${
+                  className={`max-w-[80%] p-3 rounded-xl text-xs leading-relaxed ${
                     msg.sender === "user"
                       ? "bg-[#2563eb] text-white rounded-br-none"
                       : "bg-gray-100 text-gray-800 rounded-bl-none"
