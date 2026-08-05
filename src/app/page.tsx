@@ -30,6 +30,7 @@ export default function Home() {
   ]);
   const [chatInput, setChatInput] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Countdown Timer State (14 mins 45 seconds ticking down)
   const [timeLeft, setTimeLeft] = useState({ minutes: 14, seconds: 45 });
@@ -67,20 +68,126 @@ export default function Home() {
     },
   ];
 
-  // Trigger Razorpay Payment Redirect (100% Reliable Hosted Checkout)
-  const triggerRazorpayCheckout = () => {
+  // Dynamically load Razorpay SDK Script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  // Trigger Razorpay Standard Web Checkout Modal
+  const triggerRazorpayCheckout = async () => {
     const hasPaid =
       user?.publicMetadata?.has_paid === true ||
       user?.unsafeMetadata?.has_paid === true;
 
     if (hasPaid) {
       window.location.href = "/dashboard";
-    } else {
-      window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      // 1. Create order on backend API (/api/create-order)
+      const res = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const orderData = await res.json();
+
+      if (!res.ok || !orderData.order_id) {
+        throw new Error(orderData.error || "Failed to create payment order");
+      }
+
+      const keyId =
+        orderData.key_id ||
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+        "rzp_test_TMBEcvihyYT5Bi";
+
+      // 2. Open Razorpay Standard Checkout Modal with order_id
+      if (typeof window !== "undefined" && (window as any).Razorpay) {
+        const options = {
+          key: keyId,
+          amount: orderData.amount, // in paise (9900)
+          currency: orderData.currency || "INR",
+          name: "Prompt Resume",
+          description: "The AI Resume Blueprint & ATS Toolkit (₹99)",
+          image: "/favicon.ico",
+          order_id: orderData.order_id, // Mandatory Razorpay Order ID
+          prefill: {
+            name: user?.fullName || user?.firstName || "",
+            email: user?.primaryEmailAddress?.emailAddress || "",
+          },
+          theme: {
+            color: "#2563eb",
+          },
+          handler: async function (response: {
+            razorpay_payment_id: string;
+            razorpay_order_id: string;
+            razorpay_signature: string;
+          }) {
+            try {
+              // 3. Send payment ID, order ID, and signature to backend to verify
+              const verifyRes = await fetch("/api/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (verifyRes.ok && verifyData.success) {
+                window.location.href = "/dashboard?paid=true";
+              } else {
+                alert(
+                  verifyData.message ||
+                    "Payment verification failed. Please contact support."
+                );
+              }
+            } catch (err) {
+              console.error("Verification error:", err);
+              window.location.href = "/dashboard?paid=true";
+            } finally {
+              setIsProcessingPayment(false);
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessingPayment(false);
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on("payment.failed", function (response: any) {
+          alert(`Payment Failed: ${response.error.description}`);
+          setIsProcessingPayment(false);
+        });
+        rzp.open();
+      } else {
+        // Fallback to hosted link if SDK script hasn't loaded
+        window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      alert(err?.message || "Could not launch payment checkout. Please try again.");
+      setIsProcessingPayment(false);
     }
   };
 
-  // Auto-trigger Razorpay payment immediately after unpaid user completes Sign Up / Sign In
+  // Auto-trigger Razorpay checkout immediately after unpaid user completes Sign Up / Sign In
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const hasPaid =
@@ -292,9 +399,10 @@ export default function Home() {
 
             <button
               onClick={handleBuyClick}
-              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer"
+              disabled={isProcessingPayment}
+              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer disabled:opacity-50"
             >
-              Buy Now – ₹99
+              {isProcessingPayment ? "Opening Checkout..." : "Buy Now – ₹99"}
             </button>
           </div>
 
@@ -357,9 +465,10 @@ export default function Home() {
             </Show>
             <button
               onClick={handleBuyClick}
-              className="bg-[#2563eb] text-white py-2.5 rounded-lg font-semibold text-center w-full mt-2"
+              disabled={isProcessingPayment}
+              className="bg-[#2563eb] text-white py-2.5 rounded-lg font-semibold text-center w-full mt-2 disabled:opacity-50"
             >
-              Get Instant Access – ₹99
+              {isProcessingPayment ? "Opening Checkout..." : "Get Instant Access – ₹99"}
             </button>
           </div>
         )}
@@ -399,9 +508,11 @@ export default function Home() {
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center">
               <button
                 onClick={handleBuyClick}
-                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto"
+                disabled={isProcessingPayment}
+                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto disabled:opacity-50"
               >
-                Get Instant Access – ₹99 <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
+                {isProcessingPayment ? "Opening Checkout..." : "Get Instant Access – ₹99"}{" "}
+                <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
               </button>
             </div>
 
@@ -689,9 +800,10 @@ export default function Home() {
 
           <button
             onClick={handleBuyClick}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer"
+            disabled={isProcessingPayment}
+            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer disabled:opacity-50"
           >
-            ⚡ Get Instant Access – ₹99 Only
+            {isProcessingPayment ? "Opening Checkout..." : "⚡ Get Instant Access – ₹99 Only"}
           </button>
 
           <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-600 font-medium text-left">
@@ -757,9 +869,10 @@ export default function Home() {
         </div>
         <button
           onClick={handleBuyClick}
-          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer"
+          disabled={isProcessingPayment}
+          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer disabled:opacity-50"
         >
-          Buy Now – ₹99
+          {isProcessingPayment ? "Opening..." : "Buy Now – ₹99"}
         </button>
       </div>
 

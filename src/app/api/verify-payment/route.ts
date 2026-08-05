@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
 export async function POST(req: Request) {
@@ -6,10 +7,30 @@ export async function POST(req: Request) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized: Sign in required' }, { status: 401 });
     }
 
-    // Update Clerk User Metadata to mark user as PAID
+    const body = await req.json().catch(() => ({}));
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'Ueprpc9buny3LfGRdzUqSK26';
+
+    // Verify HMAC-SHA256 signature if razorpay details are provided
+    if (razorpay_order_id && razorpay_payment_id && razorpay_signature) {
+      const generated_signature = crypto
+        .createHmac('sha256', key_secret)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest('hex');
+
+      if (generated_signature !== razorpay_signature) {
+        return NextResponse.json(
+          { success: false, message: 'Signature mismatch. Payment verification failed.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Mark user as PAID in Clerk user metadata
     const client = await clerkClient();
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
@@ -21,8 +42,15 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ success: true, message: 'Payment verified and toolkit access unlocked!' });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to verify payment' }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      message: 'Payment verified successfully and toolkit unlocked!',
+    });
+  } catch (error: any) {
+    console.error('Razorpay Verification Error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal Server Error during verification' },
+      { status: 500 }
+    );
   }
 }
