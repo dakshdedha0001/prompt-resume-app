@@ -726,11 +726,24 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-white border-t border-gray-200 pt-12 pb-16 md:pb-8 mt-auto">
-        <div className="max-w-[1060px] mx-auto px-5 text-center sm:text-left">
+      <footer id="contact" className="bg-white border-t border-gray-200 pt-12 pb-20 md:pb-10 mt-auto">
+        <div className="max-w-[1060px] mx-auto px-5 space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
             <div>© {new Date().getFullYear()} Prompt Resume. All rights reserved. • New Delhi, India</div>
-            <div>Support: support@promptresume.com</div>
+            <div className="flex flex-wrap justify-center gap-4 text-xs font-semibold text-gray-600">
+              <Link href="/privacy-policy" className="hover:text-blue-600 transition">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-blue-600 transition">
+                Terms & Conditions
+              </Link>
+              <Link href="/refund-policy" className="hover:text-blue-600 transition">
+                Refund Policy
+              </Link>
+              <Link href="/contact" className="hover:text-blue-600 transition">
+                Contact Support
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
