@@ -419,10 +419,6 @@ export default function Home() {
               >
                 Get Instant Access – ₹99 <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
               </button>
-
-              <div className="text-xs text-amber-700 font-extrabold flex items-center gap-1 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
-                <span>🔥 Only 7 copies left at ₹99!</span>
-              </div>
             </div>
 
             <div className="flex items-center justify-center lg:justify-start gap-4 pt-1 text-xs text-gray-500 font-medium">
