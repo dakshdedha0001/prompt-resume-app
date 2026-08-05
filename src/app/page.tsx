@@ -8,9 +8,14 @@ import {
   SignUpButton,
   Show,
   UserButton,
+  useUser,
+  useClerk,
 } from "@clerk/nextjs";
 
 export default function Home() {
+  const { isSignedIn } = useUser();
+  const { openSignUp } = useClerk();
+
   const [activeSlide, setActiveSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [openCurriculum, setOpenCurriculum] = useState<number | null>(0);
@@ -123,8 +128,16 @@ export default function Home() {
     }
   };
 
+  // Require Sign Up / Login before proceeding to Razorpay
   const handleBuyClick = () => {
-    window.location.href = "https://rzp.io/rzp/LVhAvNk";
+    if (!isSignedIn) {
+      openSignUp({
+        fallbackRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
+        forceRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
+      });
+    } else {
+      window.location.href = "https://rzp.io/rzp/LVhAvNk";
+    }
   };
 
   const curriculumParts = [
@@ -180,7 +193,7 @@ export default function Home() {
     },
     {
       q: "How will I receive the files after payment?",
-      a: "Immediately after successful payment via Razorpay, you will be redirected to the instant download page to download all PDFs and DOCX files.",
+      a: "Immediately after successful payment via Razorpay, you will be redirected to your Student Dashboard to download all PDFs and DOCX files.",
     },
     {
       q: "Are the Word templates easy to edit?",
@@ -738,7 +751,7 @@ export default function Home() {
         {/* AI Chatbot Button */}
         <button
           onClick={() => setChatOpen(!chatOpen)}
-          className="w-12 h-12 rounded-full bg-[#2563eb] text-white flex items-center justify-center text-xl shadow-lg hover:scale-105 transition cursor-pointer"
+          className="w-12 h-12 rounded-full bg-[#2563eb] text-[#ffffff] flex items-center justify-center text-xl shadow-lg hover:scale-105 transition cursor-pointer"
           aria-label="Open AI Assistant"
         >
           💬
