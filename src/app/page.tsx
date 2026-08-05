@@ -13,7 +13,7 @@ import {
 } from "@clerk/nextjs";
 
 export default function Home() {
-  const { user, isSignedIn } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
   const { openSignUp } = useClerk();
 
   const [activeSlide, setActiveSlide] = useState(0);
@@ -66,6 +66,22 @@ export default function Home() {
       title: "Chapter 01 — ATS Compatibility Checker Prompt Sheet",
     },
   ];
+
+  // Auto-redirect unpaid signed-in users immediately after account creation/sign in
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user) {
+      const hasPaid =
+        user.publicMetadata?.has_paid === true ||
+        user.unsafeMetadata?.has_paid === true;
+
+      const shouldRedirect = sessionStorage.getItem("redirect_to_pay") === "true";
+
+      if (shouldRedirect && !hasPaid) {
+        sessionStorage.removeItem("redirect_to_pay");
+        window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      }
+    }
+  }, [isLoaded, isSignedIn, user]);
 
   // Auto-play slide carousel
   useEffect(() => {
@@ -131,12 +147,21 @@ export default function Home() {
   // Require Sign Up / Login before proceeding directly to Razorpay
   const handleBuyClick = () => {
     if (!isSignedIn) {
+      sessionStorage.setItem("redirect_to_pay", "true");
       openSignUp({
         fallbackRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
         forceRedirectUrl: "https://rzp.io/rzp/LVhAvNk",
       });
     } else {
-      window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      const hasPaid =
+        user?.publicMetadata?.has_paid === true ||
+        user?.unsafeMetadata?.has_paid === true;
+
+      if (hasPaid) {
+        window.location.href = "/dashboard";
+      } else {
+        window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      }
     }
   };
 
