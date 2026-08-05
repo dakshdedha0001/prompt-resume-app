@@ -7,11 +7,14 @@ export default function ThankYouRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    // Instant redirect to protected Student Dashboard
-    const timer = setTimeout(() => {
-      router.push("/dashboard");
-    }, 1500);
-    return () => clearTimeout(timer);
+    // Call verify payment API to unlock files for signed in user
+    fetch("/api/verify-payment", { method: "POST" })
+      .then(() => {
+        router.push("/dashboard?paid=true");
+      })
+      .catch(() => {
+        router.push("/dashboard?paid=true");
+      });
   }, [router]);
 
   return (
@@ -22,11 +25,11 @@ export default function ThankYouRedirect() {
           Payment Successful!
         </h1>
         <p className="text-sm text-gray-600 mb-6">
-          Thank you for purchasing The Prompt Resume Blueprint & Toolkit. Redirecting you to your Student Dashboard...
+          Thank you for purchasing The Prompt Resume Blueprint & Toolkit. Unlocking your downloads and redirecting to your Student Dashboard...
         </p>
 
         <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#2563eb]">
-          <span className="animate-spin text-lg">⏳</span> Loading Your Dashboard...
+          <span className="animate-spin text-lg">⏳</span> Unlocking Your Downloads...
         </div>
       </div>
     </div>

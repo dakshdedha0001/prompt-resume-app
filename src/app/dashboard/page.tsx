@@ -1,15 +1,60 @@
 "use client";
 
+import { useState, useEffect, Suspense } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
-export default function StudentDashboard() {
+function DashboardContent() {
   const { user, isLoaded } = useUser();
+  const searchParams = useSearchParams();
+  const [verifying, setVerifying] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
-  if (!isLoaded) {
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+
+    // Check if user has already paid in metadata
+    const metaPaid =
+      user.publicMetadata?.has_paid === true ||
+      user.unsafeMetadata?.has_paid === true;
+
+    if (metaPaid) {
+      setUnlocked(true);
+      return;
+    }
+
+    // Check if user just returned from Razorpay Payment
+    const paidParam =
+      searchParams.get("paid") === "true" ||
+      searchParams.get("access") === "paid_verified" ||
+      searchParams.get("razorpay_payment_id");
+
+    if (paidParam) {
+      setVerifying(true);
+      fetch("/api/verify-payment", { method: "POST" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setUnlocked(true);
+            user.reload();
+          }
+        })
+        .finally(() => setVerifying(false));
+    }
+  }, [user, isLoaded, searchParams]);
+
+  const handlePayClick = () => {
+    window.location.href = "https://rzp.io/rzp/LVhAvNk";
+  };
+
+  if (!isLoaded || verifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
-        <div className="text-gray-500 font-medium animate-pulse">Loading your dashboard...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#fafafa]">
+        <div className="text-3xl mb-3 animate-spin">⏳</div>
+        <div className="text-gray-600 font-semibold text-sm">
+          Verifying your account & payment status...
+        </div>
       </div>
     );
   }
@@ -37,20 +82,48 @@ export default function StudentDashboard() {
 
       {/* Dashboard Main Content */}
       <main className="max-w-[840px] mx-auto px-5 py-10 w-full flex-1">
-        {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl p-6 sm:p-8 mb-8 shadow-xl">
-          <div className="flex items-center gap-4 mb-3">
-            <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-              Student Dashboard
-            </span>
+        {/* Banner: Unlocked vs Locked */}
+        {unlocked ? (
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl p-6 sm:p-8 mb-8 shadow-xl">
+            <div className="flex items-center gap-4 mb-3">
+              <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                Student Dashboard
+              </span>
+              <span className="bg-green-400/20 text-green-200 border border-green-300/30 text-xs font-bold px-3 py-1 rounded-full">
+                ✓ Toolkit Unlocked
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Welcome back, {user?.firstName || user?.fullName || "Student"}! 👋
+            </h1>
+            <p className="text-blue-100 text-sm sm:text-base mt-2 max-w-xl">
+              Access and download your purchased Prompt Resume Blueprint ebook and ATS Word templates below. All files are securely protected.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Welcome back, {user?.firstName || user?.fullName || "Student"}! 👋
-          </h1>
-          <p className="text-blue-100 text-sm sm:text-base mt-2 max-w-xl">
-            Access and download your purchased Prompt Resume Blueprint ebook and ATS Word templates below. All files are securely protected.
-          </p>
-        </div>
+        ) : (
+          <div className="bg-amber-50 border-2 border-amber-300 text-amber-900 rounded-2xl p-6 sm:p-8 mb-8 shadow-md">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">🔒</span>
+              <span className="bg-amber-200 text-amber-900 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                Toolkit Locked — Payment Pending
+              </span>
+            </div>
+            <h1 className="text-2xl font-extrabold text-amber-950 mt-1">
+              Complete ₹99 Payment to Unlock Downloads
+            </h1>
+            <p className="text-sm text-amber-800 mt-2 max-w-xl">
+              Your Student Account is created! To unlock instant download access to the 52-Page PDF Ebook and 3 ATS Word Templates, complete your ₹99 launch payment below.
+            </p>
+            <div className="mt-5">
+              <button
+                onClick={handlePayClick}
+                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-6 py-3 rounded-xl font-bold text-sm transition shadow-md cursor-pointer"
+              >
+                ⚡ Complete ₹99 Payment to Unlock Downloads
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Downloads Grid */}
         <div className="space-y-6">
@@ -58,9 +131,15 @@ export default function StudentDashboard() {
             <h2 className="text-xl font-bold tracking-tight text-gray-900">
               Your Purchased Files & Toolkit
             </h2>
-            <span className="text-xs font-semibold text-green-600 bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
-              ✓ Lifetime Access Active
-            </span>
+            {unlocked ? (
+              <span className="text-xs font-semibold text-green-600 bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
+                ✓ Lifetime Access Active
+              </span>
+            ) : (
+              <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-200">
+                🔒 Payment Required
+              </span>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -80,12 +159,22 @@ export default function StudentDashboard() {
                   Complete 23-chapter guide with 30+ ready-to-use copyable AI prompt sheets.
                 </p>
               </div>
-              <a
-                href="/api/download/ebook"
-                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>⬇️ Download PDF Ebook</span>
-              </a>
+
+              {unlocked ? (
+                <a
+                  href="/api/download/ebook"
+                  className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>⬇️ Download PDF Ebook</span>
+                </a>
+              ) : (
+                <button
+                  onClick={handlePayClick}
+                  className="bg-gray-100 text-gray-400 text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-2 border border-gray-200 hover:bg-amber-100 hover:text-amber-800"
+                >
+                  <span>🔒 Complete ₹99 Payment to Unlock</span>
+                </button>
+              )}
             </div>
 
             {/* File 2: Classic Template */}
@@ -104,12 +193,22 @@ export default function StudentDashboard() {
                   Standard single-column format optimized for Workday, Taleo, and Greenhouse ATS.
                 </p>
               </div>
-              <a
-                href="/api/download/template-classic"
-                className="bg-gray-900 hover:bg-black text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>⬇️ Download Classic DOCX</span>
-              </a>
+
+              {unlocked ? (
+                <a
+                  href="/api/download/template-classic"
+                  className="bg-gray-900 hover:bg-black text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>⬇️ Download Classic DOCX</span>
+                </a>
+              ) : (
+                <button
+                  onClick={handlePayClick}
+                  className="bg-gray-100 text-gray-400 text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-2 border border-gray-200 hover:bg-amber-100 hover:text-amber-800"
+                >
+                  <span>🔒 Complete ₹99 Payment to Unlock</span>
+                </button>
+              )}
             </div>
 
             {/* File 3: Modern Template */}
@@ -128,12 +227,22 @@ export default function StudentDashboard() {
                   Clean, modern formatting for tech, marketing, sales, and design roles.
                 </p>
               </div>
-              <a
-                href="/api/download/template-modern"
-                className="bg-gray-900 hover:bg-black text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>⬇️ Download Modern DOCX</span>
-              </a>
+
+              {unlocked ? (
+                <a
+                  href="/api/download/template-modern"
+                  className="bg-gray-900 hover:bg-black text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>⬇️ Download Modern DOCX</span>
+                </a>
+              ) : (
+                <button
+                  onClick={handlePayClick}
+                  className="bg-gray-100 text-gray-400 text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-2 border border-gray-200 hover:bg-amber-100 hover:text-amber-800"
+                >
+                  <span>🔒 Complete ₹99 Payment to Unlock</span>
+                </button>
+              )}
             </div>
 
             {/* File 4: Internship Template */}
@@ -152,12 +261,22 @@ export default function StudentDashboard() {
                   Tailored format emphasizing projects, skills, education, and achievements.
                 </p>
               </div>
-              <a
-                href="/api/download/template-internship"
-                className="bg-gray-900 hover:bg-black text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>⬇️ Download Internship DOCX</span>
-              </a>
+
+              {unlocked ? (
+                <a
+                  href="/api/download/template-internship"
+                  className="bg-gray-900 hover:bg-black text-white text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>⬇️ Download Internship DOCX</span>
+                </a>
+              ) : (
+                <button
+                  onClick={handlePayClick}
+                  className="bg-gray-100 text-gray-400 text-center py-2.5 px-4 rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-2 border border-gray-200 hover:bg-amber-100 hover:text-amber-800"
+                >
+                  <span>🔒 Complete ₹99 Payment to Unlock</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -170,5 +289,19 @@ export default function StudentDashboard() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function StudentDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+          <div className="text-gray-500 font-medium animate-pulse">Loading dashboard...</div>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }

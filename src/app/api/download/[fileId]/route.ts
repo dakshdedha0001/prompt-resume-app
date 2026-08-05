@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import path from 'path';
 import fs from 'fs';
 
@@ -10,16 +10,29 @@ export async function GET(
   try {
     // 1. Verify Clerk User Authentication
     const { userId } = await auth();
+    const user = await currentUser();
 
-    if (!userId) {
-      return new NextResponse('Unauthorized: Please sign in to access your purchased files.', {
+    if (!userId || !user) {
+      return new NextResponse('Unauthorized: Please sign in to access download files.', {
         status: 401,
       });
     }
 
+    // 2. Strict Payment Verification Check
+    const hasPaid =
+      user.publicMetadata?.has_paid === true ||
+      user.unsafeMetadata?.has_paid === true;
+
+    if (!hasPaid) {
+      return new NextResponse(
+        'Forbidden: Complete the ₹99 payment to unlock download access.',
+        { status: 403 }
+      );
+    }
+
     const { fileId } = await params;
 
-    // 2. Map fileId to actual physical files
+    // 3. Map fileId to actual physical files
     const fileMap: Record<string, { filename: string; contentType: string }> = {
       ebook: {
         filename: 'The_AI_Resume_Blueprint.pdf',
@@ -45,11 +58,10 @@ export async function GET(
       return new NextResponse('File not found', { status: 404 });
     }
 
-    // 3. Locate file path securely
+    // 4. Locate file path securely
     const filePath = path.join(process.cwd(), 'public', 'images', targetFile.filename);
 
     if (!fs.existsSync(filePath)) {
-      // Fallback response if file path is missing
       return new NextResponse('File temporary unavailable. Please contact support.', { status: 404 });
     }
 
