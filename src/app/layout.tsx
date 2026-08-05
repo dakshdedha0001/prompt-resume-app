@@ -8,6 +8,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Prompt Resume — Build a Professional ATS-Friendly Resume with AI",
   description: "A step-by-step ebook with 23 chapters and 30+ ready-to-use AI prompts to help students and freshers build an ATS-proof resume, optimize LinkedIn, write cover letters, and land more interview calls.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
