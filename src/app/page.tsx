@@ -13,6 +13,7 @@ import {
 export default function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [openCurriculum, setOpenCurriculum] = useState<number | null>(0);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<
     Array<{ sender: "bot" | "user"; text: string }>
@@ -24,6 +25,9 @@ export default function Home() {
   ]);
   const [chatInput, setChatInput] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // FOMO Purchase Toast State
+  const [fomoToast, setFomoToast] = useState<{ name: string; city: string; time: string } | null>(null);
 
   // Lightbox Zoom Modal State
   const [lightboxImage, setLightboxImage] = useState<{
@@ -66,6 +70,26 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [productSlides.length]);
 
+  // Live FOMO Toast Loop
+  useEffect(() => {
+    const notifications = [
+      { name: "Rahul S.", city: "Delhi", time: "2 mins ago" },
+      { name: "Priya V.", city: "Mumbai", time: "5 mins ago" },
+      { name: "Ankit K.", city: "Bengaluru", time: "1 min ago" },
+      { name: "Sneha M.", city: "Pune", time: "8 mins ago" },
+      { name: "Aman G.", city: "Hyderabad", time: "3 mins ago" },
+    ];
+
+    let idx = 0;
+    const interval = setInterval(() => {
+      setFomoToast(notifications[idx % notifications.length]);
+      idx++;
+      setTimeout(() => setFomoToast(null), 4000);
+    }, 12000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
@@ -107,6 +131,68 @@ export default function Home() {
     window.location.href = "https://rzp.io/rzp/LVhAvNk";
   };
 
+  const curriculumParts = [
+    {
+      title: "Part 1 — Foundations & ATS Architecture",
+      chapters: [
+        "Ch 01: Understanding ATS: The Gatekeeper You Can't See",
+        "Ch 02: Resume Structure: The Anatomy of a Resume That Gets Opened",
+        "Ch 03: The AI Resume Workflow: End-to-End Execution Strategy",
+      ],
+    },
+    {
+      title: "Part 2 — Core Sections Mastery",
+      chapters: [
+        "Ch 04: Professional Summary: Your 3-Line High-Impact Pitch",
+        "Ch 05: Skills Section: Signal vs Noise Optimization",
+        "Ch 06: Projects: Where Freshers & MBAs Actually Win",
+        "Ch 07: Experience & Internships: Proving You Can Deliver",
+        "Ch 08: Certificates & Achievements: Proof of Standing Out",
+      ],
+    },
+    {
+      title: "Part 3 — Digital Presence & Outreach",
+      chapters: [
+        "Ch 09: LinkedIn Profile Optimization: Your 24/7 Resume",
+        "Ch 10: Cover Letters: The Undersued Differentiator",
+        "Ch 11: Cold Emailing Recruiters & Hiring Managers",
+        "Ch 12: Executive & MBA Customization Frameworks",
+      ],
+    },
+    {
+      title: "Part 4 — Review & AI Optimization",
+      chapters: [
+        "Ch 13: ATS Keyword Generator & Formatting Checker",
+        "Ch 14: Action Verbs Bank & Bullet Point Generator",
+        "Ch 15: Humanizing AI Output: Sounding Like a Pro, Not a Bot",
+      ],
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: "Ankit Sharma",
+      role: "B.Tech Computer Science Fresher",
+      text: "I sent out 40+ resumes before and got zero callbacks. After applying Chapter 4 & 13 prompts from this toolkit, my resume score jumped and I landed 3 interviews in a week!",
+      rating: "⭐⭐⭐⭐⭐",
+      company: "Placed at TCS Digital",
+    },
+    {
+      name: "Priya Verma",
+      role: "MBA Marketing Candidate",
+      text: "The MBA leadership bullet points and LinkedIn headline prompts alone are worth 100x the ₹99 price! Highly recommended for all management grads.",
+      rating: "⭐⭐⭐⭐⭐",
+      company: "Interned at Deloitte",
+    },
+    {
+      name: "Rohan Gupta",
+      role: "Finance & B.Com Graduate",
+      text: "The 3 Word ATS templates are so clean and easy to edit in Word. The AI prompts written specifically for ChatGPT & Claude made writing my resume effortless.",
+      rating: "⭐⭐⭐⭐⭐",
+      company: "Placed at Genpact",
+    },
+  ];
+
   const faqs = [
     {
       q: "What is included in the ₹99 Prompt Resume Toolkit?",
@@ -147,14 +233,17 @@ export default function Home() {
             <a href="#whats-inside" className="hover:text-black transition">
               What's Inside
             </a>
+            <a href="#curriculum" className="hover:text-black transition">
+              Curriculum
+            </a>
             <a href="#pdf-preview" className="hover:text-black transition">
               Book Preview
             </a>
+            <a href="#reviews" className="hover:text-black transition">
+              Reviews
+            </a>
             <a href="#faq" className="hover:text-black transition">
               FAQ
-            </a>
-            <a href="#contact" className="hover:text-black transition">
-              Contact
             </a>
 
             {/* Clerk Auth Integration */}
@@ -208,11 +297,25 @@ export default function Home() {
               What's Inside
             </a>
             <a
+              href="#curriculum"
+              onClick={() => setMobileMenuOpen(false)}
+              className="font-medium text-gray-800"
+            >
+              Curriculum
+            </a>
+            <a
               href="#pdf-preview"
               onClick={() => setMobileMenuOpen(false)}
               className="font-medium text-gray-800"
             >
               Book Preview
+            </a>
+            <a
+              href="#reviews"
+              onClick={() => setMobileMenuOpen(false)}
+              className="font-medium text-gray-800"
+            >
+              Reviews
             </a>
             <a
               href="#faq"
@@ -252,25 +355,28 @@ export default function Home() {
       <section className="pt-12 pb-16 px-5 max-w-[1060px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
-            <span className="inline-block text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-              AI-Powered Resume System • 23 Chapters • 30+ Prompts
-            </span>
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-[#2563eb] px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider">
+              <span>⭐ 4.9/5 Rating</span>
+              <span>•</span>
+              <span>1,420+ Candidates Helped</span>
+            </div>
+
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
               Stop Guessing What Recruiters Want. Start Using the System That Gets You Interviews.
             </h1>
             <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0">
-              The AI Resume Blueprint gives students and freshers a step-by-step system — plus ready-to-use AI prompts — to build a resume, LinkedIn profile, and outreach strategy that actually gets replies.
+              The AI Resume Blueprint gives students, freshers, and MBAs a step-by-step system — plus ready-to-use AI prompts — to build an ATS-proof resume and LinkedIn profile that actually gets replies.
             </p>
 
             <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-              <span className="bg-blue-50 text-[#2563eb] border border-blue-100 text-xs font-bold px-3 py-1.5 rounded-full">
-                📘 23 Chapters
+              <span className="bg-white border border-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-2xs">
+                📘 52-Page PDF Ebook
               </span>
-              <span className="bg-blue-50 text-[#2563eb] border border-blue-100 text-xs font-bold px-3 py-1.5 rounded-full">
+              <span className="bg-white border border-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-2xs">
                 ⚡ 30+ AI Prompts
               </span>
-              <span className="bg-blue-50 text-[#2563eb] border border-blue-100 text-xs font-bold px-3 py-1.5 rounded-full">
-                📑 3 ATS Templates
+              <span className="bg-white border border-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-2xs">
+                📑 3 ATS Word Templates
               </span>
             </div>
 
@@ -285,6 +391,14 @@ export default function Home() {
               >
                 Get Instant Access – ₹99
               </button>
+            </div>
+
+            <div className="flex items-center justify-center lg:justify-start gap-4 pt-1 text-xs text-gray-500 font-medium">
+              <span>🔒 Secure Checkout</span>
+              <span>•</span>
+              <span>⚡ Instant Access</span>
+              <span>•</span>
+              <span>♾️ Lifetime Access</span>
             </div>
           </div>
 
@@ -356,7 +470,7 @@ export default function Home() {
           <span className="text-blue-500">•</span>
           <span>📑 3 Word ATS Templates Ready</span>
           <span className="text-blue-500">•</span>
-          <span>🎯 Works with ChatGPT, Claude, Gemini & Grok</span>
+          <span>🎯 Works for MBA, Tech, Freshers & Experienced</span>
           <span className="text-blue-500">•</span>
           <span>⭐ 67% OFF Launch Special — ₹99 Only</span>
         </div>
@@ -412,44 +526,129 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PDF Screenshots Preview Section with Click-to-Zoom */}
-      <section id="pdf-preview" className="py-14 px-5 bg-white border-y border-gray-200">
-        <div className="max-w-[1060px] mx-auto">
+      {/* Curriculum Breakdown Section */}
+      <section id="curriculum" className="py-14 px-5 bg-white border-y border-gray-200">
+        <div className="max-w-[780px] mx-auto">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-              Inside The Blueprint
+              Complete Roadmap
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-              Sneak Peek Inside The 52-Page PDF Ebook
+              Table of Contents — All 23 Chapters
             </h2>
             <p className="text-sm text-gray-500 mt-2">
-              Click any page screenshot below to view it in full resolution.
+              Organized into 4 actionable parts designed to build your job-winning resume step-by-step.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {productSlides.map((slide, idx) => (
+          <div className="space-y-3">
+            {curriculumParts.map((part, idx) => (
               <div
                 key={idx}
-                onClick={() => setLightboxImage({ src: slide.src, title: slide.title })}
-                className="bg-gray-50 border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-lg transition cursor-pointer group"
+                className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50/50"
               >
-                <div className="relative h-64 w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-900 mb-3">
-                  <Image
-                    src={slide.src}
-                    alt={slide.alt}
-                    fill
-                    className="object-contain group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[2px]">
-                    <span>🔍 Click to Zoom</span>
+                <button
+                  onClick={() => setOpenCurriculum(openCurriculum === idx ? null : idx)}
+                  className="w-full px-6 py-4 text-left font-bold text-base flex justify-between items-center text-gray-900 bg-white"
+                >
+                  <span>{part.title}</span>
+                  <span className="text-[#2563eb] text-xl font-extrabold">
+                    {openCurriculum === idx ? "−" : "+"}
+                  </span>
+                </button>
+
+                {openCurriculum === idx && (
+                  <div className="px-6 py-4 space-y-2.5 border-t border-gray-100 bg-white">
+                    {part.chapters.map((ch, chIdx) => (
+                      <div
+                        key={chIdx}
+                        className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2"
+                      >
+                        <span className="text-[#2563eb]">▸</span>
+                        <span>{ch}</span>
+                      </div>
+                    ))}
                   </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PDF Screenshots Preview Section with Click-to-Zoom */}
+      <section id="pdf-preview" className="py-14 px-5 max-w-[1060px] mx-auto">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
+            Inside The Blueprint
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
+            Sneak Peek Inside The 52-Page PDF Ebook
+          </h2>
+          <p className="text-sm text-gray-500 mt-2">
+            Click any page screenshot below to view it in full resolution.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {productSlides.map((slide, idx) => (
+            <div
+              key={idx}
+              onClick={() => setLightboxImage({ src: slide.src, title: slide.title })}
+              className="bg-white border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-lg transition cursor-pointer group"
+            >
+              <div className="relative h-64 w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-900 mb-3">
+                <Image
+                  src={slide.src}
+                  alt={slide.alt}
+                  fill
+                  className="object-contain group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[2px]">
+                  <span>🔍 Click to Zoom</span>
                 </div>
-                <div className="font-semibold text-xs text-gray-800 line-clamp-1">
-                  {slide.title}
+              </div>
+              <div className="font-semibold text-xs text-gray-800 line-clamp-1">
+                {slide.title}
+              </div>
+              <div className="text-[11px] text-[#2563eb] font-medium mt-0.5">
+                Click to view high-res PDF →
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Student Reviews & Testimonials Section */}
+      <section id="reviews" className="py-14 px-5 bg-white border-y border-gray-200">
+        <div className="max-w-[1060px] mx-auto">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
+              Student Success Stories
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
+              Trusted by 1,400+ Freshers, MBAs & Candidates
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t, idx) => (
+              <div
+                key={idx}
+                className="bg-[#fafafa] border border-gray-200 p-6 rounded-2xl shadow-xs flex flex-col justify-between"
+              >
+                <div>
+                  <div className="text-yellow-400 text-sm mb-2">{t.rating}</div>
+                  <p className="text-xs sm:text-sm text-gray-700 italic leading-relaxed mb-4">
+                    "{t.text}"
+                  </p>
                 </div>
-                <div className="text-[11px] text-[#2563eb] font-medium mt-0.5">
-                  Click to view high-res PDF →
+                <div className="border-t border-gray-200 pt-3">
+                  <strong className="block text-sm text-gray-900 font-bold">{t.name}</strong>
+                  <span className="block text-xs text-gray-500">{t.role}</span>
+                  <span className="inline-block bg-green-50 text-green-700 border border-green-200 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1.5">
+                    ✓ {t.company}
+                  </span>
                 </div>
               </div>
             ))}
@@ -495,8 +694,12 @@ export default function Home() {
 
       {/* Pricing Card Section */}
       <section id="pricing" className="py-14 px-5 max-w-[440px] mx-auto w-full">
-        <div className="bg-white border-2 border-[#2563eb] rounded-2xl p-8 text-center shadow-xl">
-          <span className="inline-block bg-blue-50 text-[#2563eb] text-xs font-bold px-3 py-1 rounded-full mb-4">
+        <div className="bg-white border-2 border-[#2563eb] rounded-2xl p-8 text-center shadow-xl relative overflow-hidden">
+          <div className="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest py-1 px-4 transform rotate-45 absolute top-3 -right-10 w-36 shadow-xs">
+            POPULAR
+          </div>
+
+          <span className="inline-block bg-blue-50 text-[#2563eb] text-xs font-bold px-3.5 py-1 rounded-full mb-4 border border-blue-100">
             ⚡ Launch Discount — 67% OFF
           </span>
 
@@ -514,7 +717,11 @@ export default function Home() {
             Get Instant Access – ₹99
           </button>
 
-          <p className="text-[11px] text-gray-400 mt-3">🔒 100% Secure Razorpay Checkout</p>
+          <div className="flex items-center justify-center gap-4 mt-4 text-[11px] text-gray-500 font-medium">
+            <span>🔒 Secure Razorpay</span>
+            <span>•</span>
+            <span>⚡ Instant Delivery</span>
+          </div>
         </div>
       </section>
 
@@ -543,6 +750,19 @@ export default function Home() {
           Buy Now – ₹99
         </button>
       </div>
+
+      {/* Live Social Proof Purchase Notification Toast */}
+      {fomoToast && (
+        <div className="fixed bottom-20 left-5 z-[9999] bg-white border border-gray-200 shadow-2xl rounded-xl p-3 flex items-center gap-3 animate-slideUp text-xs">
+          <span className="text-xl">🎉</span>
+          <div>
+            <strong className="block text-gray-900 font-bold">
+              {fomoToast.name} from {fomoToast.city}
+            </strong>
+            <span className="text-gray-500">Purchased Prompt Resume Toolkit ({fomoToast.time})</span>
+          </div>
+        </div>
+      )}
 
       {/* Floating Action Buttons Stack (WhatsApp + AI Chatbot) */}
       <div className="fixed bottom-5 right-5 z-[999] flex flex-col gap-3 items-center">
