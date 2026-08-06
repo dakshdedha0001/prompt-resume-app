@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     });
 
     const options = {
-      amount: 9900, // ₹99 in paise (9900 paise)
+      amount: 100, // ₹1 in paise (100 paise) for testing purpose
       currency: 'INR',
       receipt: `rcpt_${Date.now()}`,
     };
