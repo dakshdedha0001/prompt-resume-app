@@ -32,9 +32,6 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  // Countdown Timer State (14 mins 45 seconds ticking down)
-  const [timeLeft, setTimeLeft] = useState({ minutes: 14, seconds: 45 });
-
   // Lightbox Zoom Modal State
   const [lightboxImage, setLightboxImage] = useState<{
     src: string;
@@ -46,25 +43,25 @@ export default function Home() {
       src: "/images/promptresume.png",
       alt: "Prompt Resume Ebook Cover",
       badge: "Cover Shot",
-      title: "The AI Resume Blueprint — Book Cover",
+      title: "The AI Resume Blueprint: Book Cover",
     },
     {
       src: "/images/page_2.png",
-      alt: "Why This Book Exists — Page 02",
-      badge: "Inside • Page 02",
-      title: "Page 02 — Why This Book Exists & How to Use Prompts",
+      alt: "Why This Book Exists: Page 02",
+      badge: "Inside: Page 02",
+      title: "Page 02: Why This Book Exists & How to Use Prompts",
     },
     {
       src: "/images/page_3.png",
       alt: "Table of Contents",
-      badge: "Inside • Contents",
-      title: "Table of Contents — All 23 Chapters Overview",
+      badge: "Inside: Contents",
+      title: "Table of Contents: All 23 Chapters Overview",
     },
     {
       src: "/images/page_4.png",
       alt: "Chapter 1 Prompt Excerpt",
-      badge: "Inside • Chapter 01",
-      title: "Chapter 01 — ATS Compatibility Checker Prompt Sheet",
+      badge: "Inside: Chapter 01",
+      title: "Chapter 01: ATS Compatibility Checker Prompt Sheet",
     },
   ];
 
@@ -81,7 +78,7 @@ export default function Home() {
     };
   }, []);
 
-  // Razorpay Standard Checkout Implementation with Live Keys & ₹1 Test Amount
+  // Razorpay Standard Checkout Implementation
   const triggerRazorpayCheckout = async () => {
     const hasPaid =
       user?.publicMetadata?.has_paid === true ||
@@ -95,7 +92,6 @@ export default function Home() {
     setIsProcessingPayment(true);
 
     try {
-      // 1. Create order on backend API (/api/create-order) - amount: 100 paise (₹1)
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,22 +108,21 @@ export default function Home() {
         process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
         "rzp_live_TMPbTHK6smTVy5";
 
-      // 2. Open Razorpay Standard Checkout Modal with order_id
       if (typeof window !== "undefined" && (window as any).Razorpay) {
         const options = {
           key: keyId,
-          amount: orderData.amount, // 100 paise (₹1)
+          amount: orderData.amount,
           currency: orderData.currency || "INR",
           name: "Prompt Resume",
           description: "The AI Resume Blueprint & ATS Toolkit",
           image: "/favicon.ico",
-          order_id: orderData.order_id, // Mandatory Razorpay Order ID
+          order_id: orderData.order_id,
           prefill: {
             name: user?.fullName || user?.firstName || "",
             email: user?.primaryEmailAddress?.emailAddress || "",
           },
           theme: {
-            color: "#0c2340",
+            color: "#1d1d1f",
           },
           handler: async function (response: {
             razorpay_payment_id: string;
@@ -135,7 +130,6 @@ export default function Home() {
             razorpay_signature: string;
           }) {
             try {
-              // 3. Send payment ID, order ID, and signature to backend to verify
               const verifyRes = await fetch("/api/verify-payment", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -186,7 +180,6 @@ export default function Home() {
     }
   };
 
-  // Auto-redirect unpaid user to Razorpay link after Sign Up / Sign In
   useEffect(() => {
     if (isLoaded && isSignedIn && user) {
       const hasPaid =
@@ -202,29 +195,12 @@ export default function Home() {
     }
   }, [isLoaded, isSignedIn, user]);
 
-  // Auto-play slide carousel
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % productSlides.length);
     }, 3500);
     return () => clearInterval(timer);
   }, [productSlides.length]);
-
-  // Urgency Countdown Timer Effect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { minutes: prev.minutes - 1, seconds: 59 };
-        } else {
-          return { minutes: 14, seconds: 45 };
-        }
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,7 +224,7 @@ export default function Home() {
           ...prev,
           {
             sender: "bot",
-            text: "Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field — MBA, B.Tech, BBA, Finance, Marketing & Freshers. Get instant access for ₹99 today! 🚀",
+            text: "Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field. Get instant access today!",
           },
         ]);
       }
@@ -257,13 +233,12 @@ export default function Home() {
         ...prev,
         {
           sender: "bot",
-          text: "Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field — MBA, B.Tech, BBA, Finance, Marketing & Freshers. Get instant access for ₹99 today! 🚀",
+          text: "Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field. Get instant access today!",
         },
       ]);
     }
   };
 
-  // Require Sign Up / Login before proceeding to Razorpay
   const handleBuyClick = () => {
     if (!isSignedIn) {
       sessionStorage.setItem("pending_buy", "true");
@@ -278,38 +253,38 @@ export default function Home() {
 
   const curriculumParts = [
     {
-      title: "Part 1 — Foundations & ATS Architecture",
+      title: "Part 1: Foundations & ATS Architecture",
       chapters: [
         "Ch 01: Understanding ATS: The Gatekeeper You Can't See",
-        "Ch 02: Resume Structure: The Anatomy of a Resume That Gets Opened",
-        "Ch 03: The AI Resume Workflow: End-to-End Execution Strategy",
+        "Ch 02: Resume Structure: Anatomy of a Resume That Gets Opened",
+        "Ch 03: The AI Resume Workflow: End-to-End Strategy",
       ],
     },
     {
-      title: "Part 2 — Core Sections Mastery",
+      title: "Part 2: Core Sections Mastery",
       chapters: [
-        "Ch 04: Professional Summary: Your 3-Line High-Impact Pitch",
+        "Ch 04: Professional Summary: Your 3-Line Pitch",
         "Ch 05: Skills Section: Signal vs Noise Optimization",
-        "Ch 06: Projects: Where Freshers & MBAs Actually Win",
+        "Ch 06: Projects: Where Freshers & MBAs Win",
         "Ch 07: Experience & Internships: Proving You Can Deliver",
         "Ch 08: Certificates & Achievements: Proof of Standing Out",
       ],
     },
     {
-      title: "Part 3 — Digital Presence & Outreach",
+      title: "Part 3: Digital Presence & Outreach",
       chapters: [
-        "Ch 09: LinkedIn Profile Optimization: Your 24/7 Resume",
+        "Ch 09: LinkedIn Optimization: Your 24/7 Resume",
         "Ch 10: Cover Letters: The Undersued Differentiator",
         "Ch 11: Cold Emailing Recruiters & Hiring Managers",
         "Ch 12: Executive & MBA Customization Frameworks",
       ],
     },
     {
-      title: "Part 4 — Review & AI Optimization",
+      title: "Part 4: Review & AI Optimization",
       chapters: [
-        "Ch 13: ATS Keyword Generator & Formatting Checker",
+        "Ch 13: ATS Keyword Generator & Format Checker",
         "Ch 14: Action Verbs Bank & Bullet Point Generator",
-        "Ch 15: Humanizing AI Output: Sounding Like a Pro, Not a Bot",
+        "Ch 15: Humanizing AI Output: Sounding Like a Pro",
       ],
     },
   ];
@@ -342,46 +317,36 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafafa] text-[#111827] font-sans antialiased">
-      {/* Top Urgency Banner Bar */}
-      <div className="bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-md">
-        <span>⚡ FLASH SALE IS LIVE:</span>
-        <span className="bg-black/30 px-2.5 py-0.5 rounded-md tracking-wider font-mono">
-          {String(timeLeft.minutes).padStart(2, "0")}m : {String(timeLeft.seconds).padStart(2, "0")}s
-        </span>
-        <span className="hidden md:inline">• 80% OFF (₹499 → ₹99 Only)</span>
-      </div>
-
+    <div className="min-h-screen flex flex-col bg-[#fbfbfd] text-[#1d1d1f] font-sans antialiased selection:bg-[#0066cc] selection:text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#fafafa]/90 backdrop-blur-md border-b border-[#e5e7eb]">
-        <div className="max-w-[1060px] mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/" className="font-extrabold text-lg tracking-tight">
-            Prompt <span className="text-[#2563eb]">Resume</span>
+      <header className="sticky top-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-[#e5e5ea] transition-all duration-300">
+        <div className="max-w-[1060px] mx-auto px-5 h-[52px] flex items-center justify-between">
+          <Link href="/" className="font-semibold text-lg tracking-tight">
+            Prompt Resume
           </Link>
 
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <a href="#whats-inside" className="hover:text-black transition">
+          <div className="hidden md:flex items-center gap-8 text-[13px] text-[#424245]">
+            <a href="#whats-inside" className="hover:text-[#1d1d1f] transition-colors">
               What's Inside
             </a>
-            <a href="#curriculum" className="hover:text-black transition">
+            <a href="#curriculum" className="hover:text-[#1d1d1f] transition-colors">
               Curriculum
             </a>
-            <a href="#pdf-preview" className="hover:text-black transition">
+            <a href="#pdf-preview" className="hover:text-[#1d1d1f] transition-colors">
               Book Preview
             </a>
-            <a href="#faq" className="hover:text-black transition">
+            <a href="#faq" className="hover:text-[#1d1d1f] transition-colors">
               FAQ
             </a>
 
-            {/* Clerk Auth Integration */}
             <Show when="signed-out">
               <SignInButton mode="modal">
-                <button className="text-[#2563eb] font-semibold hover:underline cursor-pointer">
+                <button className="text-[#0066cc] font-medium hover:underline cursor-pointer">
                   Sign In
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="bg-gray-100 text-gray-900 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-200 transition cursor-pointer">
+                <button className="text-[#1d1d1f] font-medium hover:underline cursor-pointer">
                   Sign Up
                 </button>
               </SignUpButton>
@@ -389,66 +354,65 @@ export default function Home() {
             <Show when="signed-in">
               <Link
                 href="/dashboard"
-                className="bg-blue-50 text-[#2563eb] border border-blue-200 px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-blue-100 transition flex items-center gap-1.5"
+                className="text-[#0066cc] font-medium hover:underline flex items-center gap-1.5"
               >
-                <span>👤 My Account</span>
+                <span>My Account</span>
               </Link>
               <UserButton />
             </Show>
 
             <button
               onClick={handleBuyClick}
-              className="bg-[#0c2340] hover:bg-[#07172b] text-white px-4 py-1.5 rounded-xl font-bold text-xs transition shadow-sm cursor-pointer flex items-center gap-1.5 border border-blue-900/60"
+              className="bg-[#1d1d1f] hover:bg-[#000000] text-white px-4 py-1.5 rounded-full font-medium text-[13px] transition-all cursor-pointer flex items-center gap-2"
             >
-              <span>Pay Now (Razorpay)</span>
-              <span className="line-through text-red-300 text-[10px]">₹499</span>
-              <span className="font-extrabold text-amber-400">₹99</span>
+              <span>Buy Now</span>
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-full text-[#1d1d1f] hover:bg-[#e5e5ea] transition-colors"
           >
-            ☰
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-gray-200 px-5 py-4 flex flex-col gap-3">
+          <div className="md:hidden bg-[#fbfbfd] border-b border-[#e5e5ea] px-5 py-6 flex flex-col gap-5 shadow-sm">
             <a
               href="#whats-inside"
               onClick={() => setMobileMenuOpen(false)}
-              className="font-medium text-gray-800"
+              className="font-medium text-[15px] text-[#1d1d1f]"
             >
               What's Inside
             </a>
             <a
               href="#curriculum"
               onClick={() => setMobileMenuOpen(false)}
-              className="font-medium text-gray-800"
+              className="font-medium text-[15px] text-[#1d1d1f]"
             >
               Curriculum
             </a>
             <a
               href="#pdf-preview"
               onClick={() => setMobileMenuOpen(false)}
-              className="font-medium text-gray-800"
+              className="font-medium text-[15px] text-[#1d1d1f]"
             >
               Book Preview
             </a>
             <a
               href="#faq"
               onClick={() => setMobileMenuOpen(false)}
-              className="font-medium text-gray-800"
+              className="font-medium text-[15px] text-[#1d1d1f]"
             >
               FAQ
             </a>
             <Show when="signed-out">
               <SignInButton mode="modal">
-                <button className="text-left font-semibold text-[#2563eb]">
+                <button className="text-left font-medium text-[#0066cc] text-[15px]">
                   Sign In
                 </button>
               </SignInButton>
@@ -457,89 +421,67 @@ export default function Home() {
               <Link
                 href="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="font-bold text-[#2563eb] flex items-center gap-1"
+                className="font-medium text-[#0066cc] flex items-center gap-1.5 text-[15px]"
               >
-                👤 My Account Dashboard
+                My Account Dashboard
               </Link>
               <UserButton />
             </Show>
-            <button
-              onClick={handleBuyClick}
-              className="bg-[#0c2340] hover:bg-[#07172b] text-white py-3 rounded-xl font-bold text-center w-full mt-2 flex flex-col items-center justify-center border border-blue-900/60"
-            >
-              <div className="flex items-center gap-1.5 text-sm">
-                <span>Pay Now — Secured by</span>
-                <span className="text-sky-300 font-extrabold italic">Razorpay</span>
-              </div>
-              <div className="text-xs text-gray-300 flex items-center gap-1.5 mt-0.5">
-                <span className="line-through text-red-300">₹499</span>
-                <span className="font-extrabold text-amber-400">₹99 Only</span>
-              </div>
-            </button>
           </div>
         )}
       </header>
 
       {/* Hero Section */}
-      <section className="pt-12 pb-16 px-5 max-w-[1060px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
-            <span className="inline-block text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-              AI-POWERED RESUME SYSTEM • 23 CHAPTERS • 30+ PROMPTS
+      <section className="pt-24 pb-20 px-5 max-w-[1060px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+          <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+            <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-[#0071e3] bg-[#0071e3]/10 px-3 py-1 rounded-full">
+              The AI Resume Blueprint
             </span>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
-              Stop Guessing What Recruiters Want. Start Using the System That Gets You Interviews.
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-[1.05]">
+              Get the resume <br className="hidden lg:block"/> recruiters actually want.
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0">
-              The AI Resume Blueprint gives students, freshers, and MBAs a step-by-step system — plus ready-to-use AI prompts — to build an ATS-proof resume and LinkedIn profile that actually gets replies.
+            <p className="text-[17px] sm:text-[19px] text-[#475569] max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+              A step-by-step system with ready-to-use AI prompts to build an ATS-proof resume and LinkedIn profile that gets you interviews.
             </p>
 
-            <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-              <span className="bg-white border border-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-2xs">
-                📘 52-Page PDF Ebook
+            <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+              <span className="bg-[#f1f5f9] text-[#1e293b] text-[13px] font-semibold px-4 py-1.5 rounded-full border border-[#e2e8f0]">
+                52-Page Ebook
               </span>
-              <span className="bg-white border border-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-2xs">
-                ⚡ 30+ AI Prompts
+              <span className="bg-[#f1f5f9] text-[#1e293b] text-[13px] font-semibold px-4 py-1.5 rounded-full border border-[#e2e8f0]">
+                30+ AI Prompts
               </span>
-              <span className="bg-white border border-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-2xs">
-                📑 3 ATS Word Templates
+              <span className="bg-[#f1f5f9] text-[#1e293b] text-[13px] font-semibold px-4 py-1.5 rounded-full border border-[#e2e8f0]">
+                ATS Templates
               </span>
             </div>
 
-            <p className="text-xs text-gray-400">
-              Works with <strong className="text-gray-600">ChatGPT</strong> • <strong className="text-gray-600">Claude</strong> • <strong className="text-gray-600">Gemini</strong> • <strong className="text-gray-600">Grok</strong>
+            <p className="text-[13px] text-[#64748b] font-medium">
+              Compatible with ChatGPT, Claude, Gemini, and Grok.
             </p>
 
-            <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center">
+            <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
               <button
                 onClick={handleBuyClick}
-                className="bg-[#0c2340] hover:bg-[#07172b] text-white px-8 py-3.5 rounded-2xl font-bold text-base transition shadow-xl hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto flex flex-col items-center justify-center border-2 border-blue-600/50"
+                className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3.5 rounded-full font-semibold text-[15px] transition-all cursor-pointer w-full sm:w-auto shadow-md hover:shadow-lg active:scale-98"
               >
-                <div className="flex items-center gap-2 text-lg tracking-wide">
-                  <span>Pay Now</span>
-                  <span className="text-xs bg-blue-600/80 px-2 py-0.5 rounded text-sky-200 font-extrabold italic tracking-wider">Secured by Razorpay</span>
-                </div>
-                <div className="text-xs font-semibold text-gray-300 flex items-center gap-2 mt-0.5">
-                  <span className="line-through text-red-400">₹499</span>
-                  <span className="font-black text-amber-400 text-base">₹99 ONLY</span>
-                </div>
+                Buy Now for ₹99
               </button>
             </div>
-
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2 text-xs text-gray-600 font-semibold">
-              <span className="flex items-center gap-1.5 bg-blue-50/80 text-blue-800 px-3 py-1 rounded-lg border border-blue-100">
-                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                <span>🔒 Secured by <strong className="font-extrabold text-[#0c2340]">Razorpay</strong></span>
-              </span>
-              <span className="text-gray-500">⚡ Instant Delivery</span>
-              <span className="text-gray-500">📱 UPI • GPay • PhonePe • Cards</span>
+            
+            <div className="text-[12px] text-[#64748b] font-medium flex items-center justify-center lg:justify-start gap-1.5">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#0071e3]">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+              </svg>
+              Secured by Razorpay • Instant Access
             </div>
           </div>
 
-          {/* Interactive Product Gallery Carousel with Zoom Feature */}
+          {/* Minimalist Product Gallery Carousel */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="w-full max-w-[340px] space-y-3">
+            <div className="w-full max-w-[340px] space-y-4">
               <div
                 onClick={() =>
                   setLightboxImage({
@@ -547,12 +489,12 @@ export default function Home() {
                     title: productSlides[activeSlide].title,
                   })
                 }
-                className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-[#090d16] cursor-pointer group"
+                className="relative h-[440px] w-full rounded-[2rem] overflow-hidden bg-white border border-[#e5e5ea] shadow-sm cursor-pointer group flex items-center justify-center"
               >
                 {productSlides.map((slide, idx) => (
                   <div
                     key={idx}
-                    className={`absolute inset-0 transition-opacity duration-300 flex items-center justify-center ${
+                    className={`absolute inset-0 transition-opacity duration-500 flex items-center justify-center ${
                       idx === activeSlide ? "opacity-100 z-10" : "opacity-0 z-0"
                     }`}
                   >
@@ -560,35 +502,29 @@ export default function Home() {
                       src={slide.src}
                       alt={slide.alt}
                       fill
-                      className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      className="object-contain p-8 group-hover:scale-105 transition-transform duration-700 ease-out"
                       priority={idx === 0}
                     />
-                    <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-sky-400 text-[11px] font-bold px-2.5 py-1 rounded-full border border-sky-400/30">
+                    <span className="absolute top-4 right-4 bg-[#f5f5f7]/90 backdrop-blur-md text-[#1d1d1f] text-[11px] font-medium px-3 py-1 rounded-full">
                       {slide.badge}
                     </span>
-
-                    {/* Zoom Overlay Indicator */}
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[2px]">
-                      <span>🔍 Click to View Fullscreen</span>
-                    </div>
                   </div>
                 ))}
               </div>
 
-              {/* Thumbnails */}
-              <div className="grid grid-cols-4 gap-2">
+              {/* Minimalist Thumbnails */}
+              <div className="flex justify-center gap-2.5">
                 {productSlides.map((slide, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveSlide(idx)}
-                    className={`h-14 rounded-lg overflow-hidden border-2 transition relative ${
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       idx === activeSlide
-                        ? "border-[#2563eb] opacity-100 ring-2 ring-blue-500/20"
-                        : "border-gray-200 opacity-60 hover:opacity-100"
+                        ? "bg-[#1d1d1f] w-6"
+                        : "bg-[#d2d2d7] hover:bg-[#86868b]"
                     }`}
-                  >
-                    <Image src={slide.src} alt="thumb" fill className="object-cover" />
-                  </button>
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
                 ))}
               </div>
             </div>
@@ -596,158 +532,151 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Headlines Marquee */}
-      <section className="bg-[#111827] py-3.5 overflow-hidden">
-        <div className="whitespace-nowrap flex gap-8 animate-marquee text-white text-sm font-semibold">
-          <span>🚀 Stop Guessing What Recruiters Want</span>
-          <span className="text-blue-500">•</span>
-          <span>⚡ 80% OFF FLASH SALE — ₹99 ONLY (REGULAR ₹499)</span>
-          <span className="text-blue-500">•</span>
-          <span>📑 3 Word ATS Templates Ready</span>
-          <span className="text-blue-500">•</span>
-          <span>🎯 Works for MBA, Tech, Freshers & Experienced</span>
-          <span className="text-blue-500">•</span>
-          <span>🔥 OFFER ENDS IN {String(timeLeft.minutes).padStart(2, "0")}m : {String(timeLeft.seconds).padStart(2, "0")}s</span>
+      {/* Elegant Marquee */}
+      <section className="bg-white border-y border-[#e5e5ea] py-4 overflow-hidden">
+        <div className="whitespace-nowrap flex gap-12 animate-marquee text-[#1d1d1f] text-[13px] font-medium tracking-wide">
+          <span>Stop Guessing What Recruiters Want</span>
+          <span className="text-[#d2d2d7]">/</span>
+          <span>Limited Time Launch Price: ₹99</span>
+          <span className="text-[#d2d2d7]">/</span>
+          <span>3 Word ATS Templates Ready</span>
+          <span className="text-[#d2d2d7]">/</span>
+          <span>Works for MBA, Tech, Freshers & Experienced</span>
+          <span className="text-[#d2d2d7]">/</span>
+          <span>Stop Guessing What Recruiters Want</span>
+          <span className="text-[#d2d2d7]">/</span>
+          <span>Limited Time Launch Price: ₹99</span>
         </div>
       </section>
 
       {/* What You Get Section */}
-      <section id="whats-inside" className="py-14 px-5 max-w-[1060px] mx-auto">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-            What's Inside
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-            Everything You Need to Build an ATS-Proof Resume
+      <section id="whats-inside" className="py-24 px-5 max-w-[1060px] mx-auto">
+        <div className="text-center max-w-xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0f172a]">
+            Everything you need.
           </h2>
+          <p className="text-[17px] text-[#475569] mt-3 font-medium">
+            A complete toolkit to build an ATS-proof resume from scratch.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-3xl mb-3">📘</div>
-            <h3 className="font-bold text-lg mb-1">52-Page Ebook Blueprint</h3>
-            <p className="text-sm text-gray-600">23 step-by-step chapters guiding you from resume audit to interview preparation.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-3xl mb-3">⚡</div>
-            <h3 className="font-bold text-lg mb-1">30+ AI Prompt Sheets</h3>
-            <p className="text-sm text-gray-600">Ready-to-use, copy-paste prompts to write bullet points, ATS keywords, and summaries.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-3xl mb-3">📑</div>
-            <h3 className="font-bold text-lg mb-1">3 ATS Word Templates</h3>
-            <p className="text-sm text-gray-600">Classic, Modern, and Internship formats (.docx) designed to pass ATS screeners.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-3xl mb-3">✉️</div>
-            <h3 className="font-bold text-lg mb-1">Cover Letters & Emails</h3>
-            <p className="text-sm text-gray-600">10+ tailored templates for cold emailing recruiters and follow-up messages.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-3xl mb-3">💼</div>
-            <h3 className="font-bold text-lg mb-1">LinkedIn Optimizer</h3>
-            <p className="text-sm text-gray-600">Generate high-converting headlines, about sections, and experience descriptions.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
-            <div className="text-[#2563eb] text-3xl mb-3">📊</div>
-            <h3 className="font-bold text-lg mb-1">7-Category HR Matrix</h3>
-            <p className="text-sm text-gray-600">Audit your own resume against the exact scorecard HR recruiters use to screen candidates.</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              icon: "📘",
+              title: "52-Page Ebook",
+              desc: "23 step-by-step chapters guiding you from resume audit to interview preparation.",
+            },
+            {
+              icon: "⚡",
+              title: "30+ AI Prompts",
+              desc: "Ready-to-use, copy-paste prompts to write bullet points, ATS keywords, and summaries.",
+            },
+            {
+              icon: "📑",
+              title: "ATS Templates",
+              desc: "Classic, Modern, and Internship formats (.docx) designed to pass ATS screeners.",
+            },
+            {
+              icon: "✉️",
+              title: "Cover Letters",
+              desc: "10+ tailored templates for cold emailing recruiters and follow-up messages.",
+            },
+            {
+              icon: "💼",
+              title: "LinkedIn Optimizer",
+              desc: "Generate high-converting headlines, about sections, and experience descriptions.",
+            },
+            {
+              icon: "📊",
+              title: "HR Matrix",
+              desc: "Audit your own resume against the exact scorecard HR recruiters use to screen candidates.",
+            },
+          ].map((feature, idx) => (
+            <div key={idx} className="bg-white p-8 rounded-3xl shadow-sm border border-[#e2e8f0] hover:shadow-md transition-shadow duration-300">
+              <div className="text-3xl mb-4 grayscale opacity-85">{feature.icon}</div>
+              <h3 className="font-bold text-[17px] text-[#0f172a] mb-2">{feature.title}</h3>
+              <p className="text-[14px] text-[#475569] leading-relaxed">{feature.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Curriculum Breakdown Section */}
-      <section id="curriculum" className="py-14 px-5 bg-white border-y border-gray-200">
+      <section id="curriculum" className="py-24 px-5 bg-white border-y border-[#e2e8f0]">
         <div className="max-w-[780px] mx-auto">
-          <div className="text-center max-w-xl mx-auto mb-10">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-              Complete Roadmap
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-              Table of Contents — All 23 Chapters
+          <div className="text-center max-w-xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0f172a]">
+              The Roadmap.
             </h2>
-            <p className="text-sm text-gray-500 mt-2">
-              Organized into 4 actionable parts designed to build your job-winning resume step-by-step.
+            <p className="text-[17px] text-[#475569] mt-3 font-medium">
+              Organized into 4 actionable parts to build your job-winning resume.
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {curriculumParts.map((part, idx) => (
               <div
                 key={idx}
-                className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50/50"
+                className="border-b border-[#e2e8f0] pb-2 last:border-0"
               >
                 <button
                   onClick={() => setOpenCurriculum(openCurriculum === idx ? null : idx)}
-                  className="w-full px-6 py-4 text-left font-bold text-base flex justify-between items-center text-gray-900 bg-white"
+                  className="w-full py-4 text-left font-semibold text-[17px] flex justify-between items-center text-[#0f172a] hover:text-[#0071e3] transition-colors"
                 >
                   <span>{part.title}</span>
-                  <span className="text-[#2563eb] text-xl font-extrabold">
-                    {openCurriculum === idx ? "−" : "+"}
-                  </span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`transform transition-transform duration-300 ${openCurriculum === idx ? 'rotate-180 text-[#0071e3]' : 'text-[#64748b]'}`}>
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </button>
 
-                {openCurriculum === idx && (
-                  <div className="px-6 py-4 space-y-2.5 border-t border-gray-100 bg-white">
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openCurriculum === idx ? 'max-h-[400px] opacity-100 mb-6' : 'max-h-0 opacity-0'}`}>
+                  <div className="pl-2 space-y-3 pt-2">
                     {part.chapters.map((ch, chIdx) => (
                       <div
                         key={chIdx}
-                        className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2"
+                        className="text-[14px] font-medium text-[#334155] flex items-start gap-3"
                       >
-                        <span className="text-[#2563eb]">▸</span>
+                        <span className="text-[#0071e3] mt-0.5">•</span>
                         <span>{ch}</span>
                       </div>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PDF Screenshots Preview Section with Click-to-Zoom */}
-      <section id="pdf-preview" className="py-14 px-5 max-w-[1060px] mx-auto">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-            Inside The Blueprint
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-            Sneak Peek Inside The 52-Page PDF Ebook
+      {/* PDF Screenshots Preview Section */}
+      <section id="pdf-preview" className="py-24 px-5 max-w-[1060px] mx-auto">
+        <div className="text-center max-w-xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0f172a]">
+            Inside the blueprint.
           </h2>
-          <p className="text-sm text-gray-500 mt-2">
-            Click any page screenshot below to view it in full resolution.
+          <p className="text-[17px] text-[#475569] mt-3 font-medium">
+            A sneak peek inside the 52-page PDF ebook.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {productSlides.map((slide, idx) => (
             <div
               key={idx}
               onClick={() => setLightboxImage({ src: slide.src, title: slide.title })}
-              className="bg-white border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-lg transition cursor-pointer group"
+              className="group cursor-pointer"
             >
-              <div className="relative h-64 w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-900 mb-3">
+              <div className="relative h-72 w-full rounded-2xl overflow-hidden bg-[#f8fafc] border border-[#e2e8f0] mb-4 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
                 <Image
                   src={slide.src}
                   alt={slide.alt}
                   fill
-                  className="object-contain group-hover:scale-105 transition-transform duration-300"
+                  className="object-contain p-4"
                 />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[2px]">
-                  <span>🔍 Click to Zoom</span>
-                </div>
               </div>
-              <div className="font-semibold text-xs text-gray-800 line-clamp-1">
+              <div className="font-semibold text-[14px] text-[#0f172a]">
                 {slide.title}
-              </div>
-              <div className="text-[11px] text-[#2563eb] font-medium mt-0.5">
-                Click to view high-res PDF →
               </div>
             </div>
           ))}
@@ -755,169 +684,133 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-14 px-5 max-w-[680px] mx-auto w-full">
-        <div className="text-center mb-8">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#2563eb]">
-            Got Questions?
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-            Frequently Asked Questions
+      <section id="faq" className="py-24 px-5 max-w-[780px] mx-auto w-full">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0f172a]">
+            Questions?
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+              className="border-b border-[#e2e8f0] last:border-0"
             >
               <button
                 onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                className="w-full px-5 py-4 text-left font-semibold text-sm flex justify-between items-center text-gray-900"
+                className="w-full py-5 text-left font-semibold text-[16px] flex justify-between items-center text-[#0f172a] hover:text-[#0071e3] transition-colors"
               >
                 <span>{faq.q}</span>
-                <span className="text-gray-400 text-lg">
-                  {openFaq === idx ? "−" : "+"}
-                </span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`transform transition-transform duration-300 ${openFaq === idx ? 'rotate-180 text-[#0071e3]' : 'text-[#64748b]'}`}>
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
-              {openFaq === idx && (
-                <div className="px-5 pb-4 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3">
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaq === idx ? 'max-h-[400px] opacity-100 pb-6' : 'max-h-0 opacity-0'}`}>
+                <div className="text-[15px] text-[#334155] leading-relaxed pr-8 font-normal">
                   {faq.a}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Catchy High-Converting Pricing Card Section */}
-      <section id="pricing" className="py-14 px-5 max-w-[460px] mx-auto w-full">
-        <div className="bg-white border-2 border-[#2563eb] rounded-2xl p-8 text-center shadow-2xl relative overflow-hidden ring-4 ring-blue-500/10">
-          <div className="bg-[#2563eb] text-white text-[10px] font-black uppercase tracking-widest py-1.5 px-6 transform rotate-45 absolute top-4 -right-10 w-40 shadow-sm">
-            80% OFF
+      {/* Clean Pricing Card Section */}
+      <section id="pricing" className="py-24 px-5 max-w-[460px] mx-auto w-full">
+        <div className="bg-white border border-[#e2e8f0] rounded-[2rem] p-10 text-center shadow-lg relative overflow-hidden">
+          <div className="mb-2">
+             <span className="text-[13px] font-bold tracking-widest text-[#0071e3] uppercase bg-[#0071e3]/10 px-3 py-1 rounded-full">Lifetime Access</span>
           </div>
 
-          <span className="inline-block bg-red-50 text-red-600 text-xs font-extrabold px-3.5 py-1 rounded-full mb-4 border border-red-200">
-            🔥 FLASH SALE ENDS IN {String(timeLeft.minutes).padStart(2, "0")}:{String(timeLeft.seconds).padStart(2, "0")}
-          </span>
-
-          <div className="flex items-baseline justify-center gap-3 mb-1">
-            <span className="text-5xl font-black text-[#2563eb] tracking-tight">₹99</span>
-            <span className="text-xl text-gray-400 line-through font-bold">₹499</span>
+          <div className="flex items-baseline justify-center gap-2 mb-2 mt-4">
+            <span className="text-6xl font-bold text-[#0f172a] tracking-tight">₹99</span>
           </div>
-
-          <p className="text-xs text-gray-500 font-medium mb-5">
-            Regular Price ₹499 • Launch Special ₹99 • Lifetime Access
-          </p>
+          
+          <div className="text-[15px] text-[#64748b] font-medium mb-8">
+            <span className="line-through">Regular Price ₹499</span>
+          </div>
 
           <button
             onClick={handleBuyClick}
-            className="bg-[#0c2340] hover:bg-[#07172b] text-white py-4 px-6 rounded-2xl font-black text-lg w-full transition shadow-xl hover:-translate-y-0.5 cursor-pointer flex flex-col items-center justify-center border-2 border-blue-600/50"
+            className="bg-[#0071e3] hover:bg-[#0077ed] text-white py-4 px-6 rounded-full font-semibold text-[16px] w-full transition-all cursor-pointer shadow-md hover:shadow-lg mb-6 active:scale-98"
           >
-            <div className="flex items-center gap-2">
-              <span>Pay Now</span>
-              <span className="text-xs bg-blue-600/80 px-2.5 py-0.5 rounded text-sky-200 font-extrabold italic tracking-wider">Secured by Razorpay</span>
-            </div>
-            <div className="text-sm font-bold text-gray-300 flex items-center gap-2 mt-1">
-              <span className="line-through text-red-400 font-semibold">₹499</span>
-              <span className="font-black text-amber-400 text-lg">₹99 ONLY</span>
-            </div>
+            Buy Now for ₹99
           </button>
 
-          <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-600 font-medium text-left">
-            <div className="flex items-center gap-2">
-              <span className="text-green-600 font-bold">✓</span>
-              <span>52-Page Ebook PDF (23 Chapters)</span>
+          <div className="space-y-3 text-[14px] text-[#1e293b] font-medium text-left bg-[#f8fafc] p-5 rounded-2xl border border-[#e2e8f0]">
+            <div className="flex items-center gap-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071e3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>52-Page Ebook PDF</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600 font-bold">✓</span>
-              <span>30+ Copyable AI Prompt Sheets</span>
+            <div className="flex items-center gap-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071e3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>30+ AI Prompts</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600 font-bold">✓</span>
-              <span>3 Word ATS Templates (.docx)</span>
+            <div className="flex items-center gap-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071e3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>3 ATS Templates</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-green-600 font-bold">✓</span>
-              <span>Instant Download & Student Dashboard</span>
-            </div>
-          </div>
-
-          {/* Official Secured by Razorpay Authenticity Badge */}
-          <div className="mt-5 pt-4 border-t border-gray-100 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2 bg-[#0c2340] text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md border border-blue-900/50 hover:scale-102 transition">
-              <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-              </svg>
-              <span>Pay Now — Secured by <span className="text-sky-400 font-extrabold italic tracking-wider">Razorpay</span></span>
-            </div>
-            <div className="text-[11px] text-gray-400 font-medium">
-              Accepts UPI • PhonePe • Google Pay • Paytm • Cards • NetBanking
+            <div className="flex items-center gap-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071e3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Instant Download</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-white border-t border-gray-200 pt-12 pb-20 md:pb-10 mt-auto">
+      <footer id="contact" className="bg-[#fbfbfd] border-t border-[#e5e5ea] pt-12 pb-24 md:pb-12 mt-auto">
         <div className="max-w-[1060px] mx-auto px-5 space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-            <div>© {new Date().getFullYear()} Prompt Resume. All rights reserved. • New Delhi, India</div>
-            <div className="flex flex-wrap justify-center gap-4 text-xs font-semibold text-gray-600">
-              <Link href="/privacy-policy" className="hover:text-blue-600 transition">
+          <div className="flex flex-col sm:flex-row justify-between items-center text-[12px] text-[#86868b] gap-6">
+            <div>© {new Date().getFullYear()} Prompt Resume. All rights reserved. New Delhi, India.</div>
+            <div className="flex flex-wrap justify-center gap-6 font-medium">
+              <Link href="/privacy-policy" className="hover:text-[#1d1d1f] transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="hover:text-blue-600 transition">
+              <Link href="/terms" className="hover:text-[#1d1d1f] transition-colors">
                 Terms & Conditions
               </Link>
-              <Link href="/refund-policy" className="hover:text-blue-600 transition">
+              <Link href="/refund-policy" className="hover:text-[#1d1d1f] transition-colors">
                 Refund Policy
               </Link>
-              <Link href="/contact" className="hover:text-blue-600 transition">
-                Contact Support
+              <Link href="/contact" className="hover:text-[#1d1d1f] transition-colors">
+                Contact
               </Link>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* Mobile Sticky Bottom Buy Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-2.5 flex items-center justify-between shadow-2xl">
+      {/* Mobile Sticky Bottom Buy Bar (Clean) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-[#e5e5ea] px-5 py-3 flex items-center justify-between">
         <div>
-          <div className="text-[10px] text-red-600 font-extrabold uppercase flex items-center gap-1">
-            <span>🔥 80% OFF ENDS IN</span>
-            <span className="font-mono">{String(timeLeft.minutes).padStart(2, "0")}:{String(timeLeft.seconds).padStart(2, "0")}</span>
+          <div className="text-[17px] font-semibold text-[#1d1d1f]">
+            ₹99
           </div>
-          <div className="text-base font-extrabold text-[#2563eb]">
-            ₹99 <span className="text-xs text-gray-400 line-through font-normal">₹499</span>
+          <div className="text-[12px] text-[#86868b] font-medium">
+            Lifetime Access
           </div>
         </div>
         <button
           onClick={handleBuyClick}
-          className="bg-[#0c2340] text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer flex flex-col items-center border border-blue-900"
+          className="bg-[#1d1d1f] hover:bg-[#000000] text-white px-6 py-2.5 rounded-full font-medium text-[14px] cursor-pointer transition-colors"
         >
-          <div className="flex items-center gap-1">
-            <span>Pay Now</span>
-            <span className="text-[9px] text-sky-300 font-bold italic">Razorpay</span>
-          </div>
-          <div className="text-[10px] flex items-center gap-1">
-            <span className="line-through text-red-300">₹499</span>
-            <span className="text-amber-400 font-extrabold">₹99</span>
-          </div>
+          Buy Now
         </button>
       </div>
 
-      {/* Floating Action Buttons Stack (Instagram DM + AI Chatbot) */}
-      <div className="fixed bottom-5 right-5 z-[999] flex flex-col gap-3 items-center">
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-20 md:bottom-6 right-5 z-[999] flex flex-col gap-3 items-center">
         {/* Instagram DM Button */}
         <a
           href="https://ig.me/m/prompt_resume"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-lg hover:scale-105 transition"
+          className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center shadow-lg transition-all duration-150 ease-out hover:scale-110 active:scale-95"
           aria-label="DM on Instagram"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
           </svg>
         </a>
@@ -925,10 +818,16 @@ export default function Home() {
         {/* AI Chatbot Button */}
         <button
           onClick={() => setChatOpen(!chatOpen)}
-          className="w-12 h-12 rounded-full bg-[#2563eb] text-[#ffffff] flex items-center justify-center text-xl shadow-lg hover:scale-105 transition cursor-pointer"
+          className="w-12 h-12 rounded-full bg-[#0071e3] text-white flex items-center justify-center shadow-lg transition-all duration-150 ease-out hover:scale-110 active:scale-95 cursor-pointer"
           aria-label="Open AI Assistant"
         >
-          💬
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2" />
+            <circle cx="12" cy="5" r="2" />
+            <path d="M12 7v4" />
+            <line x1="8" y1="16" x2="8" y2="16.01" />
+            <line x1="16" y1="16" x2="16" y2="16.01" />
+          </svg>
         </button>
       </div>
 
@@ -936,60 +835,59 @@ export default function Home() {
       {lightboxImage && (
         <div
           onClick={() => setLightboxImage(null)}
-          className="fixed inset-0 z-[100000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 cursor-zoom-out animate-fadeIn"
+          className="fixed inset-0 z-[100000] bg-white/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 cursor-zoom-out animate-fadeIn"
         >
           <div className="relative max-w-4xl w-full max-h-[90vh] h-full flex flex-col items-center justify-center">
             <button
               onClick={() => setLightboxImage(null)}
-              className="absolute top-2 right-2 sm:-top-10 sm:-right-10 text-white hover:text-gray-300 text-3xl font-bold z-50 p-2"
+              className="absolute top-4 right-4 sm:-top-8 sm:-right-8 text-[#1d1d1f] hover:text-[#86868b] p-2 transition-colors"
             >
-              ✕
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            <div className="relative w-full h-full max-h-[80vh] rounded-xl overflow-hidden bg-gray-950 border border-gray-800 shadow-2xl">
+            <div className="relative w-full h-full max-h-[80vh] rounded-2xl overflow-hidden bg-white border border-[#e5e5ea] shadow-sm">
               <Image
                 src={lightboxImage.src}
                 alt={lightboxImage.title}
                 fill
-                className="object-contain p-2"
+                className="object-contain p-4"
               />
             </div>
-            <div className="text-white text-xs sm:text-sm font-semibold mt-4 text-center bg-gray-900/80 px-4 py-2 rounded-full border border-gray-700">
-              {lightboxImage.title} • (Click anywhere to close)
+            <div className="text-[#1d1d1f] text-[13px] font-medium mt-6 text-center">
+              {lightboxImage.title}
             </div>
           </div>
         </div>
       )}
 
-      {/* AI Chat Window Overlay */}
+      {/* AI Chat Window */}
       {chatOpen && (
-        <div className="fixed bottom-20 right-5 w-80 sm:w-96 bg-white border border-gray-200 rounded-2xl shadow-2xl z-[10000] flex flex-col overflow-hidden">
-          <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🤖</span>
+        <div className="fixed bottom-36 md:bottom-24 right-5 w-[340px] sm:w-[380px] bg-white border border-[#e5e5ea] rounded-2xl shadow-xl z-[10000] flex flex-col overflow-hidden animate-fadeIn">
+          <div className="px-5 py-4 border-b border-[#e5e5ea] flex justify-between items-center bg-[#fbfbfd]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#1d1d1f] flex items-center justify-center text-white text-[14px]">AI</div>
               <div>
-                <strong className="block text-sm">Prompt Resume AI</strong>
-                <span className="text-[11px] text-gray-500">Career Assistant</span>
+                <strong className="block text-[14px] font-semibold text-[#1d1d1f]">Career Assistant</strong>
               </div>
             </div>
             <button
               onClick={() => setChatOpen(false)}
-              className="text-gray-400 hover:text-gray-600 text-sm font-bold"
+              className="text-[#86868b] hover:text-[#1d1d1f] transition-colors"
             >
-              ✕
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           </div>
 
-          <div className="p-4 h-64 overflow-y-auto space-y-3">
+          <div className="p-5 h-[320px] overflow-y-auto space-y-4 bg-white">
             {chatMessages.map((msg, idx) => (
               <div
                 key={idx}
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] p-3 rounded-xl text-xs leading-relaxed ${
+                  className={`max-w-[85%] p-3.5 rounded-2xl text-[14px] leading-relaxed ${
                     msg.sender === "user"
-                      ? "bg-[#2563eb] text-white rounded-br-none"
-                      : "bg-gray-100 text-gray-800 rounded-bl-none"
+                      ? "bg-[#1d1d1f] text-white rounded-br-sm"
+                      : "bg-[#f5f5f7] text-[#1d1d1f] rounded-bl-sm"
                   }`}
                 >
                   {msg.text}
@@ -998,19 +896,19 @@ export default function Home() {
             ))}
           </div>
 
-          <form onSubmit={handleChatSubmit} className="p-2 border-t border-gray-200 flex gap-2">
+          <form onSubmit={handleChatSubmit} className="p-3 border-t border-[#e5e5ea] flex gap-2 bg-[#fbfbfd]">
             <input
               type="text"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Ask about resumes, ATS..."
-              className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-blue-500"
+              placeholder="Ask anything..."
+              className="flex-1 px-4 py-2.5 text-[14px] bg-white border border-[#e5e5ea] rounded-full outline-none focus:border-[#1d1d1f] transition-colors"
             />
             <button
               type="submit"
-              className="bg-[#2563eb] text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer"
+              className="w-10 h-10 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center cursor-pointer transition-transform hover:scale-105 flex-shrink-0"
             >
-              ➤
+               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
           </form>
         </div>
