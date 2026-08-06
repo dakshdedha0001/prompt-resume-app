@@ -77,7 +77,7 @@ export default function Home() {
     if (hasPaid) {
       window.location.href = "/dashboard";
     } else {
-      window.location.href = "https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view";
+      window.location.href = "https://rzp.io/rzp/LVhAvNk";
     }
   };
 

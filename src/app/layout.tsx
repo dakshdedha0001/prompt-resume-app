@@ -27,10 +27,10 @@ export default function RootLayout({
     <html lang="en" className={`${inter.className} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <ClerkProvider
-          signInFallbackRedirectUrl="https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view"
-          signUpFallbackRedirectUrl="https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view"
-          signInForceRedirectUrl="https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view"
-          signUpForceRedirectUrl="https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view"
+          signInFallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+          signUpFallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+          signInForceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+          signUpForceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
         >
           {children}
         </ClerkProvider>
