@@ -78,7 +78,7 @@ export default function Home() {
       window.location.href = "/dashboard";
     } else {
       setIsProcessingPayment(true);
-      window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      window.location.href = "https://pages.razorpay.com/pl_TM7354DbTXicGS/view";
     }
   };
 
