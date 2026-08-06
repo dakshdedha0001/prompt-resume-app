@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="font-bold text-base text-gray-900 mb-2">2. How We Use Your Information</h2>
             <p>
-              We use your information to fulfill digital file downloads, manage student account access on your dashboard, provide customer support via WhatsApp or email, and send order confirmation updates.
+              We use your information to fulfill digital file downloads, manage student account access on your dashboard, provide customer support via Instagram DM (@prompt_resume) or email, and send order confirmation updates.
             </p>
           </section>
 

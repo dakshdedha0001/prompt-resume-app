@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 Key Knowledge Base & Policy Instructions:
 1. REFUND & CANCELLATION POLICY (NO REFUNDS / DIGITAL PRODUCTS):
    If the user asks about refund, return policy, money-back guarantee, or cancellations, respond clearly & professionally:
-   "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Student Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on WhatsApp/Email to assist you immediately! 🚀"
+   "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Student Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on Instagram DM (@prompt_resume) and Email to assist you immediately! 🚀"
 
 2. POSITIVE & HIGH-CONVERTING:
    Always give 100% positive, encouraging, and confident answers for ANY student or candidate background (MBA, B.Tech, BBA, B.Com, Freshers, Experienced, Engineers, Finance, Marketing, HR, Product Management, etc.).
@@ -75,7 +75,7 @@ function getFallbackReply(msg: string): string {
     m.includes('wapas') ||
     m.includes('cancel')
   ) {
-    return "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Student Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on WhatsApp/Email to assist you immediately! 🚀";
+    return "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Student Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on Instagram DM (@prompt_resume) and Email to assist you immediately! 🚀";
   }
   if (m.includes('mba')) {
     return 'Yes, 100%! The toolkit includes specialized AI prompts for MBA resumes, management leadership metrics, and executive ATS keywords to help you stand out to top recruiters! 🎯';

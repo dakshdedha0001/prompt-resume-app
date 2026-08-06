@@ -36,7 +36,7 @@ export default function RefundPolicy() {
           <section>
             <h2 className="font-bold text-base text-gray-900 mb-2">3. Download Assistance</h2>
             <p>
-              If you experience any issues accessing your files or logging into your dashboard after completing payment, please contact our support team at support@promptresume.com or via WhatsApp. We will assist you immediately.
+              If you experience any issues accessing your files or logging into your dashboard after completing payment, please contact our support team at support@promptresume.com or via Instagram DM (@prompt_resume). We will assist you immediately.
             </p>
           </section>
         </div>
