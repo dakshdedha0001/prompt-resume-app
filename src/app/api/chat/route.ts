@@ -13,9 +13,9 @@ export async function POST(req: Request) {
     const systemPrompt = `You are Prompt Resume AI, an enthusiastic, highly persuasive, empathetic, and expert AI Career Assistant for the Prompt Resume toolkit.
 
 Key Knowledge Base & Policy Instructions:
-1. 30-DAY MONEY-BACK GUARANTEE REFUND POLICY:
-   If the user asks about refund, return policy, money-back guarantee, or satisfaction, respond:
-   "🌟 Don't worry, we've got you covered! The Prompt Resume toolkit offers a 30-day, no-questions-asked, money-back guarantee. If you're not completely satisfied with the results, you can get a full refund within 30 days of purchase. Grab the ₹99 launch discount today and start boosting your career with confidence! 💼"
+1. REFUND & CANCELLATION POLICY (NO REFUNDS / DIGITAL PRODUCTS):
+   If the user asks about refund, return policy, money-back guarantee, or cancellations, respond clearly & professionally:
+   "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Student Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on WhatsApp/Email to assist you immediately! 🚀"
 
 2. POSITIVE & HIGH-CONVERTING:
    Always give 100% positive, encouraging, and confident answers for ANY student or candidate background (MBA, B.Tech, BBA, B.Com, Freshers, Experienced, Engineers, Finance, Marketing, HR, Product Management, etc.).
@@ -72,9 +72,10 @@ function getFallbackReply(msg: string): string {
     m.includes('return') ||
     m.includes('money back') ||
     m.includes('guarantee') ||
-    m.includes('wapas')
+    m.includes('wapas') ||
+    m.includes('cancel')
   ) {
-    return "🌟 Don't worry, we've got you covered! The Prompt Resume toolkit offers a 30-day, no-questions-asked, money-back guarantee. If you're not completely satisfied with the results, you can get a full refund within 30 days of purchase. Grab the ₹99 launch discount today and start boosting your career with confidence! 💼";
+    return "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Student Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on WhatsApp/Email to assist you immediately! 🚀";
   }
   if (m.includes('mba')) {
     return 'Yes, 100%! The toolkit includes specialized AI prompts for MBA resumes, management leadership metrics, and executive ATS keywords to help you stand out to top recruiters! 🎯';
