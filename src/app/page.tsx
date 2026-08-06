@@ -406,12 +406,13 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="flex items-center justify-center lg:justify-start gap-4 pt-1 text-xs text-gray-500 font-medium">
-              <span>🔒 Secure Checkout</span>
-              <span>•</span>
-              <span>⚡ Instant Access</span>
-              <span>•</span>
-              <span>♾️ Lifetime Access</span>
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2 text-xs text-gray-600 font-semibold">
+              <span className="flex items-center gap-1.5 bg-blue-50/80 text-blue-800 px-3 py-1 rounded-lg border border-blue-100">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                <span>🔒 Secured by <strong className="font-extrabold text-[#0c2340]">Razorpay</strong></span>
+              </span>
+              <span className="text-gray-500">⚡ Instant Delivery</span>
+              <span className="text-gray-500">📱 UPI • GPay • PhonePe • Cards</span>
             </div>
           </div>
 
@@ -714,10 +715,17 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-4 mt-5 text-[11px] text-gray-500 font-medium">
-            <span>🔒 Secure Razorpay</span>
-            <span>•</span>
-            <span>⚡ Instant Delivery</span>
+          {/* Official Secured by Razorpay Authenticity Badge */}
+          <div className="mt-5 pt-4 border-t border-gray-100 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2 bg-[#0c2340] text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md border border-blue-900/50 hover:scale-102 transition">
+              <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+              </svg>
+              <span>Pay Now — Secured by <span className="text-sky-400 font-extrabold italic tracking-wider">Razorpay</span></span>
+            </div>
+            <div className="text-[11px] text-gray-400 font-medium">
+              Accepts UPI • PhonePe • Google Pay • Paytm • Cards • NetBanking
+            </div>
           </div>
         </div>
       </section>
