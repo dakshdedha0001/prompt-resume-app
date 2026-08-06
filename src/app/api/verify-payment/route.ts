@@ -28,7 +28,7 @@ export async function GET(req: Request) {
   }
 }
 
-// Handle Server-to-Server or Verification API Calls (POST Request)
+// Handle Standard Checkout Verification (POST Request)
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
@@ -40,29 +40,45 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'XSpjObO3u61C61LjB6GEuOwx';
-
-    // Verify HMAC-SHA256 signature if razorpay details are provided
-    if (razorpay_order_id && razorpay_payment_id && razorpay_signature) {
-      const generated_signature = crypto
-        .createHmac('sha256', key_secret)
-        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-        .digest('hex');
-
-      if (generated_signature !== razorpay_signature) {
-        return NextResponse.json(
-          { success: false, message: 'Signature mismatch. Payment verification failed.' },
-          { status: 400 }
-        );
-      }
+    // Validate all 3 required fields are present
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return NextResponse.json(
+        { success: false, message: 'Missing payment verification fields (order_id, payment_id, signature).' },
+        { status: 400 }
+      );
     }
 
-    // Mark user as PAID in Clerk user metadata
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_secret) {
+      console.error('RAZORPAY_KEY_SECRET missing from environment variables');
+      return NextResponse.json(
+        { success: false, message: 'Payment service configuration error' },
+        { status: 500 }
+      );
+    }
+
+    // Verify HMAC-SHA256 signature: HMAC-SHA256(order_id + "|" + payment_id, KEY_SECRET)
+    const generated_signature = crypto
+      .createHmac('sha256', key_secret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (generated_signature !== razorpay_signature) {
+      return NextResponse.json(
+        { success: false, message: 'Signature mismatch. Payment verification failed.' },
+        { status: 400 }
+      );
+    }
+
+    // Signature verified — Mark user as PAID in Clerk user metadata
     const client = await clerkClient();
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
         has_paid: true,
         paid_at: new Date().toISOString(),
+        razorpay_payment_id,
+        razorpay_order_id,
       },
       unsafeMetadata: {
         has_paid: true,

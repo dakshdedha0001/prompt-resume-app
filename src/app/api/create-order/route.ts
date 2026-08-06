@@ -10,8 +10,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: Sign in required' }, { status: 401 });
     }
 
-    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMBGmp5WcsBdZ2';
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'XSpjObO3u61C61LjB6GEuOwx';
+    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_id || !key_secret) {
+      console.error('Razorpay credentials missing from environment variables');
+      return NextResponse.json({ error: 'Payment service configuration error' }, { status: 500 });
+    }
 
     const instance = new Razorpay({
       key_id,
@@ -19,9 +24,9 @@ export async function POST(req: Request) {
     });
 
     const options = {
-      amount: 100, // ₹1 in paise (100 paise) for testing
+      amount: 9900, // ₹99 in paise
       currency: 'INR',
-      receipt: `receipt_${Date.now()}`,
+      receipt: `receipt_${userId}_${Date.now()}`,
     };
 
     const order = await instance.orders.create(options);
