@@ -21,6 +21,9 @@ function DashboardContent() {
 
     if (metaPaid) {
       setUnlocked(true);
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "Purchase", { value: 99, currency: "INR" });
+      }
       return;
     }
 
@@ -37,6 +40,9 @@ function DashboardContent() {
         .then((data) => {
           if (data.success) {
             setUnlocked(true);
+            if (typeof window !== "undefined" && (window as any).fbq) {
+              (window as any).fbq("track", "Purchase", { value: 99, currency: "INR" });
+            }
             user.reload();
           }
         })
