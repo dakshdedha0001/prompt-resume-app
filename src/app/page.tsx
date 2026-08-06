@@ -68,16 +68,121 @@ export default function Home() {
     },
   ];
 
-  // Clean Direct Payment Link Redirect
-  const triggerRazorpayCheckout = () => {
+  // Dynamically load Razorpay SDK Script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  // Razorpay Standard Checkout Implementation with Live Keys & ₹1 Test Amount
+  const triggerRazorpayCheckout = async () => {
     const hasPaid =
       user?.publicMetadata?.has_paid === true ||
       user?.unsafeMetadata?.has_paid === true;
 
     if (hasPaid) {
       window.location.href = "/dashboard";
-    } else {
-      window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      // 1. Create order on backend API (/api/create-order) - amount: 100 paise (₹1)
+      const res = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const orderData = await res.json();
+
+      if (!res.ok || !orderData.order_id) {
+        throw new Error(orderData.error || "Failed to create Razorpay order");
+      }
+
+      const keyId =
+        orderData.key_id ||
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+        "rzp_live_TMPbTHK6smTVy5";
+
+      // 2. Open Razorpay Standard Checkout Modal with order_id
+      if (typeof window !== "undefined" && (window as any).Razorpay) {
+        const options = {
+          key: keyId,
+          amount: orderData.amount, // 100 paise (₹1)
+          currency: orderData.currency || "INR",
+          name: "Prompt Resume",
+          description: "The AI Resume Blueprint & ATS Toolkit",
+          image: "/favicon.ico",
+          order_id: orderData.order_id, // Mandatory Razorpay Order ID
+          prefill: {
+            name: user?.fullName || user?.firstName || "",
+            email: user?.primaryEmailAddress?.emailAddress || "",
+          },
+          theme: {
+            color: "#0c2340",
+          },
+          handler: async function (response: {
+            razorpay_payment_id: string;
+            razorpay_order_id: string;
+            razorpay_signature: string;
+          }) {
+            try {
+              // 3. Send payment ID, order ID, and signature to backend to verify
+              const verifyRes = await fetch("/api/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (verifyRes.ok && verifyData.success) {
+                window.location.href = "/dashboard?paid=true";
+              } else {
+                alert(
+                  verifyData.message ||
+                    "Payment verification failed. Please contact support."
+                );
+              }
+            } catch (err) {
+              console.error("Verification error:", err);
+              window.location.href = "/dashboard?paid=true";
+            } finally {
+              setIsProcessingPayment(false);
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessingPayment(false);
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on("payment.failed", function (response: any) {
+          alert(`Payment Failed: ${response.error.description}`);
+          setIsProcessingPayment(false);
+        });
+        rzp.open();
+      } else {
+        window.location.href = "https://rzp.io/rzp/LVhAvNk";
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      alert(err?.message || "Could not launch payment checkout. Please try again.");
+      setIsProcessingPayment(false);
     }
   };
 

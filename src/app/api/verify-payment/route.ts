@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || '8tyi0kZQaOmlwe7l2G6b5aRc';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'z0HntokTFSl2ednnbbDkfw81';
 
     // Verify HMAC-SHA256 signature: HMAC-SHA256(order_id + "|" + payment_id, KEY_SECRET)
     const generated_signature = crypto

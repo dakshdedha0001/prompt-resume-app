@@ -10,8 +10,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: Sign in required' }, { status: 401 });
     }
 
-    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMMmw2iLWjKmE9';
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || '8tyi0kZQaOmlwe7l2G6b5aRc';
+    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_TMPbTHK6smTVy5';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'z0HntokTFSl2ednnbbDkfw81';
 
     const instance = new Razorpay({
       key_id,
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     });
 
     const options = {
-      amount: 9900, // ₹99 in paise
+      amount: 100, // ₹1 in paise (100 paise) for testing purpose
       currency: 'INR',
       receipt: `rcpt_${Date.now()}`,
     };

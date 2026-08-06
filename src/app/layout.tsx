@@ -27,10 +27,10 @@ export default function RootLayout({
     <html lang="en" className={`${inter.className} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <ClerkProvider
-          signInFallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-          signUpFallbackRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-          signInForceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
-          signUpForceRedirectUrl="https://rzp.io/rzp/LVhAvNk"
+          signInFallbackRedirectUrl="/"
+          signUpFallbackRedirectUrl="/"
+          signInForceRedirectUrl="/"
+          signUpForceRedirectUrl="/"
         >
           {children}
         </ClerkProvider>
