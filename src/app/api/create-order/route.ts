@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const options = {
       amount: 9900, // ₹99 in paise
       currency: 'INR',
-      receipt: `receipt_${userId}_${Date.now()}`,
+      receipt: `rcpt_${Date.now()}`,
     };
 
     const order = await instance.orders.create(options);
