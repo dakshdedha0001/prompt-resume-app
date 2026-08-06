@@ -77,7 +77,6 @@ export default function Home() {
     if (hasPaid) {
       window.location.href = "/dashboard";
     } else {
-      setIsProcessingPayment(true);
       window.location.href = "https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view";
     }
   };
@@ -294,10 +293,9 @@ export default function Home() {
 
             <button
               onClick={handleBuyClick}
-              disabled={isProcessingPayment}
-              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer disabled:opacity-50"
+              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer"
             >
-              {isProcessingPayment ? "Opening Checkout..." : "Buy Now – ₹99"}
+              Buy Now – ₹99
             </button>
           </div>
 
@@ -360,10 +358,9 @@ export default function Home() {
             </Show>
             <button
               onClick={handleBuyClick}
-              disabled={isProcessingPayment}
-              className="bg-[#2563eb] text-white py-2.5 rounded-lg font-semibold text-center w-full mt-2 disabled:opacity-50"
+              className="bg-[#2563eb] text-white py-2.5 rounded-lg font-semibold text-center w-full mt-2"
             >
-              {isProcessingPayment ? "Opening Checkout..." : "Get Instant Access – ₹99"}
+              Get Instant Access – ₹99
             </button>
           </div>
         )}
@@ -403,10 +400,9 @@ export default function Home() {
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center">
               <button
                 onClick={handleBuyClick}
-                disabled={isProcessingPayment}
-                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto disabled:opacity-50"
+                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto"
               >
-                {isProcessingPayment ? "Opening Checkout..." : "Get Instant Access – ₹99"} <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
+                Get Instant Access – ₹99 <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
               </button>
             </div>
 
@@ -694,10 +690,9 @@ export default function Home() {
 
           <button
             onClick={handleBuyClick}
-            disabled={isProcessingPayment}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer disabled:opacity-50"
+            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer"
           >
-            {isProcessingPayment ? "Opening Checkout..." : "⚡ Get Instant Access – ₹99 Only"}
+            ⚡ Get Instant Access – ₹99 Only
           </button>
 
           <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-600 font-medium text-left">
@@ -763,10 +758,9 @@ export default function Home() {
         </div>
         <button
           onClick={handleBuyClick}
-          disabled={isProcessingPayment}
-          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer disabled:opacity-50"
+          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer"
         >
-          {isProcessingPayment ? "Opening..." : "Buy Now – ₹99"}
+          Buy Now – ₹99
         </button>
       </div>
 
