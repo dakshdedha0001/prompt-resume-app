@@ -293,9 +293,11 @@ export default function Home() {
 
             <button
               onClick={handleBuyClick}
-              className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm cursor-pointer"
+              className="bg-[#0c2340] hover:bg-[#07172b] text-white px-4 py-1.5 rounded-xl font-bold text-xs transition shadow-sm cursor-pointer flex items-center gap-1.5 border border-blue-900/60"
             >
-              Buy Now – ₹99
+              <span>Pay Now (Razorpay)</span>
+              <span className="line-through text-red-300 text-[10px]">₹499</span>
+              <span className="font-extrabold text-amber-400">₹99</span>
             </button>
           </div>
 
@@ -358,9 +360,16 @@ export default function Home() {
             </Show>
             <button
               onClick={handleBuyClick}
-              className="bg-[#2563eb] text-white py-2.5 rounded-lg font-semibold text-center w-full mt-2"
+              className="bg-[#0c2340] hover:bg-[#07172b] text-white py-3 rounded-xl font-bold text-center w-full mt-2 flex flex-col items-center justify-center border border-blue-900/60"
             >
-              Get Instant Access – ₹99
+              <div className="flex items-center gap-1.5 text-sm">
+                <span>Pay Now — Secured by</span>
+                <span className="text-sky-300 font-extrabold italic">Razorpay</span>
+              </div>
+              <div className="text-xs text-gray-300 flex items-center gap-1.5 mt-0.5">
+                <span className="line-through text-red-300">₹499</span>
+                <span className="font-extrabold text-amber-400">₹99 Only</span>
+              </div>
             </button>
           </div>
         )}
@@ -400,9 +409,16 @@ export default function Home() {
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center">
               <button
                 onClick={handleBuyClick}
-                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-7 py-3.5 rounded-xl font-bold text-base transition shadow-md hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto"
+                className="bg-[#0c2340] hover:bg-[#07172b] text-white px-8 py-3.5 rounded-2xl font-bold text-base transition shadow-xl hover:-translate-y-0.5 cursor-pointer w-full sm:w-auto flex flex-col items-center justify-center border-2 border-blue-600/50"
               >
-                Get Instant Access – ₹99 <span className="line-through opacity-70 text-xs font-normal ml-1">₹499</span>
+                <div className="flex items-center gap-2 text-lg tracking-wide">
+                  <span>Pay Now</span>
+                  <span className="text-xs bg-blue-600/80 px-2 py-0.5 rounded text-sky-200 font-extrabold italic tracking-wider">Secured by Razorpay</span>
+                </div>
+                <div className="text-xs font-semibold text-gray-300 flex items-center gap-2 mt-0.5">
+                  <span className="line-through text-red-400">₹499</span>
+                  <span className="font-black text-amber-400 text-base">₹99 ONLY</span>
+                </div>
               </button>
             </div>
 
@@ -691,9 +707,16 @@ export default function Home() {
 
           <button
             onClick={handleBuyClick}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 px-6 rounded-xl font-extrabold text-base w-full transition shadow-lg hover:-translate-y-0.5 cursor-pointer"
+            className="bg-[#0c2340] hover:bg-[#07172b] text-white py-4 px-6 rounded-2xl font-black text-lg w-full transition shadow-xl hover:-translate-y-0.5 cursor-pointer flex flex-col items-center justify-center border-2 border-blue-600/50"
           >
-            ⚡ Get Instant Access – ₹99 Only
+            <div className="flex items-center gap-2">
+              <span>Pay Now</span>
+              <span className="text-xs bg-blue-600/80 px-2.5 py-0.5 rounded text-sky-200 font-extrabold italic tracking-wider">Secured by Razorpay</span>
+            </div>
+            <div className="text-sm font-bold text-gray-300 flex items-center gap-2 mt-1">
+              <span className="line-through text-red-400 font-semibold">₹499</span>
+              <span className="font-black text-amber-400 text-lg">₹99 ONLY</span>
+            </div>
           </button>
 
           <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-xs text-gray-600 font-medium text-left">
@@ -766,9 +789,16 @@ export default function Home() {
         </div>
         <button
           onClick={handleBuyClick}
-          className="bg-[#2563eb] text-white px-5 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer"
+          className="bg-[#0c2340] text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md cursor-pointer flex flex-col items-center border border-blue-900"
         >
-          Buy Now – ₹99
+          <div className="flex items-center gap-1">
+            <span>Pay Now</span>
+            <span className="text-[9px] text-sky-300 font-bold italic">Razorpay</span>
+          </div>
+          <div className="text-[10px] flex items-center gap-1">
+            <span className="line-through text-red-300">₹499</span>
+            <span className="text-amber-400 font-extrabold">₹99</span>
+          </div>
         </button>
       </div>
 
