@@ -68,7 +68,19 @@ export default function Home() {
     },
   ];
 
-  // Original Direct Payment Link Redirect
+  // Dynamically inject Razorpay Payment Button Script for Overlay Checkout Modal
+  useEffect(() => {
+    const container = document.getElementById("rzp-payment-form");
+    if (container && !container.querySelector("script")) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/payment-button.js";
+      script.setAttribute("data-payment_button_id", "pl_TMOXfrXGArnLYY");
+      script.async = true;
+      container.appendChild(script);
+    }
+  }, []);
+
+  // Launch Razorpay Overlay Modal directly on top of website
   const triggerRazorpayCheckout = () => {
     const hasPaid =
       user?.publicMetadata?.has_paid === true ||
@@ -76,8 +88,13 @@ export default function Home() {
 
     if (hasPaid) {
       window.location.href = "/dashboard";
+      return;
+    }
+
+    const rzpBtn = document.querySelector(".razorpay-payment-button") as HTMLElement;
+    if (rzpBtn) {
+      rzpBtn.click();
     } else {
-      setIsProcessingPayment(true);
       window.location.href = "https://pages.razorpay.com/pl_TMOXfrXGArnLYY/view";
     }
   };
@@ -878,6 +895,9 @@ export default function Home() {
           </form>
         </div>
       )}
+
+      {/* Hidden Razorpay Payment Button Container for Overlay Checkout Modal */}
+      <form id="rzp-payment-form" className="hidden" />
     </div>
   );
 }
