@@ -10,13 +10,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: Sign in required' }, { status: 401 });
     }
 
-    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-    const key_secret = process.env.RAZORPAY_KEY_SECRET;
-
-    if (!key_id || !key_secret) {
-      console.error('Razorpay credentials missing from environment variables');
-      return NextResponse.json({ error: 'Payment service configuration error' }, { status: 500 });
-    }
+    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMMmw2iLWjKmE9';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET || '8tyi0kZQaOmlwe7l2G6b5aRc';
 
     const instance = new Razorpay({
       key_id,
