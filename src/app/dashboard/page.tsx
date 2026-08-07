@@ -93,7 +93,7 @@ function DashboardContent() {
           <div className="bg-white border border-[#e2e8f0] rounded-3xl p-8 mb-10 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-[#0071e3]/10 text-[#0071e3] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
-                Student Dashboard
+                Dashboard
               </span>
               <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold px-3 py-1 rounded-full flex items-center gap-1">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -101,7 +101,7 @@ function DashboardContent() {
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0f172a]">
-              Welcome back, {user?.firstName || user?.fullName || "Student"}
+              Welcome back, {user?.firstName || user?.fullName || "there"}
             </h1>
             <p className="text-[#475569] text-[15px] mt-2 max-w-xl font-medium leading-relaxed">
               Your Prompt Resume Toolkit is unlocked and ready. Download your PDF ebook and ATS Word templates below.
@@ -302,7 +302,7 @@ function DashboardContent() {
   );
 }
 
-export default function StudentDashboard() {
+export default function UserDashboard() {
   return (
     <Suspense
       fallback={

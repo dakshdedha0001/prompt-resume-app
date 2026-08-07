@@ -304,7 +304,7 @@ export default function Home() {
     },
     {
       q: "How will I receive the files after payment?",
-      a: "Immediately after successful payment via Razorpay, you will be redirected to your Student Dashboard to download all PDFs and DOCX files.",
+      a: "Immediately after successful payment via Razorpay, you will be redirected to your Dashboard to download all PDFs and DOCX files.",
     },
     {
       q: "Are the Word templates easy to edit?",

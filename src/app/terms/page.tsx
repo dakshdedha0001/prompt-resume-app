@@ -36,7 +36,7 @@ export default function TermsConditions() {
           <section>
             <h2 className="font-bold text-base text-gray-900 mb-2">3. Product Delivery</h2>
             <p>
-              The toolkit is a digital download product. Access to all files is granted immediately on your Student Dashboard upon successful payment completion via Razorpay.
+              The toolkit is a digital download product. Access to all files is granted immediately on your Dashboard upon successful payment completion via Razorpay.
             </p>
           </section>
 

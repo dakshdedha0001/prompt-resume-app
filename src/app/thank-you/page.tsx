@@ -25,7 +25,7 @@ export default function ThankYouRedirect() {
           Payment Successful!
         </h1>
         <p className="text-sm text-gray-600 mb-6">
-          Thank you for purchasing The Prompt Resume Blueprint & Toolkit. Unlocking your downloads and redirecting to your Student Dashboard...
+          Thank you for purchasing The Prompt Resume Blueprint & Toolkit. Unlocking your downloads and redirecting to your Dashboard...
         </p>
 
         <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#2563eb]">

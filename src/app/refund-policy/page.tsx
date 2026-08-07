@@ -22,7 +22,7 @@ export default function RefundPolicy() {
           <section>
             <h2 className="font-bold text-base text-gray-900 mb-2">1. Digital Products Policy</h2>
             <p>
-              Due to the immediate digital access nature of the Prompt Resume Toolkit (PDF Ebook + ATS Word Templates), purchases are generally non-refundable once the digital files have been delivered to your Student Dashboard.
+              Due to the immediate digital access nature of the Prompt Resume Toolkit (PDF Ebook + ATS Word Templates), purchases are generally non-refundable once the digital files have been delivered to your Dashboard.
             </p>
           </section>
 
