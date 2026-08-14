@@ -17,12 +17,15 @@ INSTRUCTIONS:
 2. TONE & LANGUAGE: Friendly, highly encouraging, conversational, and natural. Match the user's language (English or Hinglish).
 3. REFUND POLICY: If asked about refund/return/cancellation:
    "Due to immediate digital file delivery (PDF Ebook & ATS Word Templates), all sales are final once files are unlocked on your Dashboard. If you face any payment or download issues, our support team is available 24/7 on Instagram DM (@prompt_resume) to assist you!"
-4. TOOLKIT HIGHLIGHTS (Mention relevant ones naturally):
+4. SAMPLE PROMPT DEMO: If asked for a sample prompt, demo prompt, example prompt, "prompt batao", "sample dikhao", or "show me a prompt", share this real sample prompt from Chapter 04 of our PDF Ebook:
+   "Act as an ATS Specialist & Resume Writer. Rewrite my raw experience bullet point for a [Job Title] role: '[Paste your raw work/project details]'. Add strong action verbs, quantifiable metrics (%, $, numbers), and top ATS keywords for [Target Industry]. Keep it concise and high-impact."
+   And tell them the ₹99 toolkit contains 30+ such copyable prompts for every section!
+5. TOOLKIT HIGHLIGHTS:
    - Price: ₹99 launch offer (regular ₹499, one-time payment, lifetime access).
    - Includes: 52-Page PDF Ebook (23 chapters), 30+ copyable AI prompts, 3 ATS Word templates (.docx), 10+ cover letter & cold email scripts, LinkedIn guide, and 7-category HR matrix.
    - Compatibility: Works with ChatGPT, Claude, Gemini, and Grok on mobile & laptop.
    - Delivery: Instant access on Dashboard immediately after Razorpay payment.
-5. BREVITY: Keep responses helpful, direct, and concise (2-4 sentences max).`;
+6. BREVITY: Keep responses helpful, direct, and concise (2-4 sentences max).`;
 
     if (groqApiKey) {
       try {
@@ -64,6 +67,20 @@ INSTRUCTIONS:
 
 function getFallbackReply(msg: string): string {
   const m = msg.toLowerCase();
+
+  // Sample Prompt Request
+  if (
+    m.includes("sample") ||
+    m.includes("example") ||
+    m.includes("demo") ||
+    m.includes("prompt batao") ||
+    m.includes("prompt dikhao") ||
+    m.includes("show me a prompt") ||
+    m.includes("kaise prompt") ||
+    m.includes("prompt text")
+  ) {
+    return 'Here is a real sample prompt from Chapter 04 of our PDF Ebook:\n\n"Act as an ATS Specialist & Professional Resume Writer. Rewrite my raw experience bullet point for a [Target Role]: [Paste your raw work/project details]. Add strong action verbs, quantifiable metrics (%, $, numbers), and top ATS keywords for [Target Industry]. Keep it concise and high-impact."\n\nOur ₹99 toolkit includes 30+ such ready-to-use copyable prompts for summaries, projects, skills, cover letters, and LinkedIn! 🚀';
+  }
 
   // Refund / Cancellation
   if (
