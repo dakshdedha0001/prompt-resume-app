@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.className} h-full antialiased`}>
       <head>
-        {/* Meta Pixel Code (Pixel ID: 28284242684501146) */}
+        {/* Meta Pixel Code (Pixel ID: 3226577287526954) */}
         <Script
           id="fb-pixel"
           strategy="afterInteractive"
@@ -41,7 +41,7 @@ export default function RootLayout({
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '28284242684501146');
+              fbq('init', '3226577287526954');
               fbq('track', 'PageView');
             `,
           }}
@@ -51,7 +51,7 @@ export default function RootLayout({
             height="1"
             width="1"
             style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=28284242684501146&ev=PageView&noscript=1"
+            src="https://www.facebook.com/tr?id=3226577287526954&ev=PageView&noscript=1"
             alt="facebook-pixel-noscript"
           />
         </noscript>
