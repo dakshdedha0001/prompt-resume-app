@@ -1,97 +1,173 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const { message } = await req.json();
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    if (!message || typeof message !== "string") {
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.GROQ_API_KEY || '';
-    const grokApiKey = process.env.GROQ_API_KEY || '';
+    const groqApiKey = process.env.GROQ_API_KEY || "";
 
-    let systemPrompt = `You are Prompt Resume AI, an enthusiastic, highly persuasive, empathetic, and expert AI Career Assistant for the Prompt Resume toolkit.
+    const systemPrompt = `You are Prompt Resume AI, a highly intelligent, empathetic, persuasive, and expert AI Career Assistant for the Prompt Resume Toolkit (promptresume.shop).
 
-Key Knowledge Base & Policy Instructions:
-1. REFUND & CANCELLATION POLICY (NO REFUNDS / DIGITAL PRODUCTS):
-   If the user asks about refund, return policy, money-back guarantee, or cancellations, respond clearly & professionally:
-   "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on Instagram DM (@prompt_resume) and Email to assist you immediately! 🚀"`;
+INSTRUCTIONS:
+1. DIRECT & SPECIFIC: Always answer the user's specific question directly first. Do NOT give robotic or repetitive generic answers. Adapt to their specific field (e.g. B.Tech, MBA, Finance, Marketing, Design, Freshers, Experienced).
+2. TONE & LANGUAGE: Friendly, highly encouraging, conversational, and natural. Match the user's language (English or Hinglish).
+3. REFUND POLICY: If asked about refund/return/cancellation:
+   "Due to immediate digital file delivery (PDF Ebook & ATS Word Templates), all sales are final once files are unlocked on your Dashboard. If you face any payment or download issues, our support team is available 24/7 on Instagram DM (@prompt_resume) to assist you!"
+4. TOOLKIT HIGHLIGHTS (Mention relevant ones naturally):
+   - Price: ₹99 launch offer (regular ₹499, one-time payment, lifetime access).
+   - Includes: 52-Page PDF Ebook (23 chapters), 30+ copyable AI prompts, 3 ATS Word templates (.docx), 10+ cover letter & cold email scripts, LinkedIn guide, and 7-category HR matrix.
+   - Compatibility: Works with ChatGPT, Claude, Gemini, and Grok on mobile & laptop.
+   - Delivery: Instant access on Dashboard immediately after Razorpay payment.
+5. BREVITY: Keep responses helpful, direct, and concise (2-4 sentences max).`;
 
-    systemPrompt += (
-      " Always give 100% positive, encouraging, and confident answers for ANY candidate background (MBA, B.Tech, BBA, B.Com, Freshers, Experienced, Engineers, Finance, Marketing, HR, Product Management, etc.)."
-    );
-    systemPrompt += (
-      " Highlight key benefits: 23 Chapters, 30+ Copy-Paste AI Prompts, 3 ATS-formatted Word Templates (.docx), 10+ Cover Letter & Cold Email Scripts, LinkedIn Optimization Guide, HR Scorecard Matrix. Instant Delivery for ₹99 ONLY!"
-    );
-    systemPrompt += (
-      " Answer clearly, concisely, politely, and keep responses short (max 2-3 sentences). Always include a call-to-action encouraging them to get the ₹99 toolkit!"
-    );
-    systemPrompt += (
-      " FAQ Answers summary: - Compatibility: ChatGPT, Claude, Gemini, Grok. - Pricing: ₹99 One-time, Lifetime access. - Delivery: Instant Download & Access on Dashboard immediately after payment."
-    );
+    if (groqApiKey) {
+      try {
+        const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${groqApiKey}`,
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: message },
+            ],
+            temperature: 0.7,
+            max_tokens: 300,
+          }),
+        });
 
-    try {
-      const grokRes = await fetch("https://api.x.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${grokApiKey}`,
-        },
-        body: JSON.stringify({
-          model: "grok-beta",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: message },
-          ],
-          temperature: 0.7,
-          max_tokens: 250,
-        }),
-      });
-
-      if (grokRes.ok) {
-        const data = await grokRes.json();
-        const reply = data?.choices?.[0]?.message?.content;
-        if (reply) {
-          return NextResponse.json({ reply });
+        if (groqRes.ok) {
+          const data = await groqRes.json();
+          const reply = data?.choices?.[0]?.message?.content;
+          if (reply && reply.trim()) {
+            return NextResponse.json({ reply: reply.trim() });
+          }
         }
+      } catch (err) {
+        console.error("Groq AI API Error:", err);
       }
-    } catch (err) {
-      console.error("Grok AI Chat API error:", err);
     }
 
+    // Fallback smart rule-based responder
     return NextResponse.json({ reply: getFallbackReply(message) });
   } catch (error) {
-    return NextResponse.json({ reply: getFallbackReply('') });
+    return NextResponse.json({ reply: getFallbackReply("") });
   }
 }
 
 function getFallbackReply(msg: string): string {
   const m = msg.toLowerCase();
+
+  // Refund / Cancellation
   if (
-    m.includes('refund') ||
-    m.includes('return') ||
-    m.includes('money back') ||
-    m.includes('guarantee') ||
-    m.includes('wapas') ||
-    m.includes('cancel')
+    m.includes("refund") ||
+    m.includes("return") ||
+    m.includes("money back") ||
+    m.includes("guarantee") ||
+    m.includes("wapas") ||
+    m.includes("cancel")
   ) {
-    return "Due to the immediate digital access nature of the Prompt Resume Toolkit (instant access to downloadable 52-page PDF ebook, copyable AI prompts, and Word templates), all sales are final and non-refundable once digital files are delivered to your Dashboard. However, if you face any technical issues or duplicate payment charges, our support team is available 24/7 on Instagram DM (@prompt_resume) and Email to assist you immediately! 🚀";
+    return "Due to the immediate digital access nature of our PDF Ebook and Word templates, all sales are final once delivered to your Dashboard. If you face any download or payment issues, our support team is active 24/7 on Instagram DM (@prompt_resume) to resolve it immediately!";
   }
-  if (m.includes('mba')) {
-    return 'Yes, 100%! The toolkit includes specialized AI prompts for MBA resumes, management leadership metrics, and executive ATS keywords to help you stand out to top recruiters! 🎯';
+
+  // Price & Payment
+  if (
+    m.includes("price") ||
+    m.includes("cost") ||
+    m.includes("kitna") ||
+    m.includes("kitne") ||
+    m.includes("charge") ||
+    m.includes("rupee") ||
+    m.includes("rs") ||
+    m.includes("pay")
+  ) {
+    return "The complete Prompt Resume Toolkit is currently available for just ₹99 (80% OFF launch special, regular ₹499). It is a one-time payment with lifetime access and no hidden subscription fees! 🚀";
   }
-  if (m.includes('price') || m.includes('cost') || m.includes('kitna') || m.includes('kitne')) {
-    return 'The complete toolkit is just ₹99 — 80% OFF launch special (regular ₹499), one-time payment with lifetime access! 🚀';
+
+  // Tech / B.Tech / Developer / Coding
+  if (
+    m.includes("tech") ||
+    m.includes("developer") ||
+    m.includes("coding") ||
+    m.includes("software") ||
+    m.includes("b.tech") ||
+    m.includes("btech") ||
+    m.includes("cs") ||
+    m.includes("it")
+  ) {
+    return "Yes! The toolkit includes specialized tech prompts to showcase GitHub projects, tech stacks, frameworks, and quantifiable bullet points that pass ATS screeners at companies like TCS, Infosys, Wipro, and tech startups! 💻";
   }
-  if (m.includes('ats')) {
-    return 'ATS filters resumes before a human sees them. Our toolkit includes 30+ AI prompts to audit and guarantee 90+ ATS score for your resume! 📘';
+
+  // MBA / Management / Business
+  if (
+    m.includes("mba") ||
+    m.includes("bba") ||
+    m.includes("management") ||
+    m.includes("business") ||
+    m.includes("consulting")
+  ) {
+    return "Absolutely! We provide dedicated MBA & executive prompts focused on leadership metrics, ROI figures, strategy, and business impact to help management candidates stand out to top corporate recruiters! 🎯";
   }
-  if (m.includes('template')) {
-    return 'You get 3 ATS templates (.docx): Classic, Modern, and Internship formats. Edit in Word or Google Docs! 📑';
+
+  // Fresher / Student / College
+  if (
+    m.includes("fresher") ||
+    m.includes("college") ||
+    m.includes("experience nahi") ||
+    m.includes("no experience") ||
+    m.includes("student")
+  ) {
+    return "Perfect for freshers! Chapter 06 & 07 guide you step-by-step on how to turn academic projects, internships, coursework, and extracurricular activities into impressive, ATS-proof resume bullet points! 🎓";
   }
-  if (m.includes('linkedin')) {
-    return 'Our toolkit includes LinkedIn optimization prompts for your headline, about section, and experience bullet points! 💼';
+
+  // ATS / Score / Screening
+  if (m.includes("ats") || m.includes("score") || m.includes("pass") || m.includes("system")) {
+    return "ATS (Applicant Tracking Systems) screen out over 75% of resumes automatically. Our 3 ATS Word templates (.docx) and keyword generator prompts ensure your resume achieves a 90+ ATS score! 📑";
   }
-  return 'Yes, 100%! The Prompt Resume Toolkit is designed to get you interview calls for any field — MBA, B.Tech, BBA, Finance, Marketing & Freshers. Get instant access for ₹99 today! 🚀';
+
+  // Templates
+  if (m.includes("template") || m.includes("word") || m.includes("docx") || m.includes("format")) {
+    return "You get 3 fully editable ATS Word templates (.docx): Classic, Modern, and Internship formats. You can edit them easily on Microsoft Word, Google Docs, or WPS Office on phone or laptop! 📑";
+  }
+
+  // LinkedIn / Outreach / Cover Letter / Email
+  if (
+    m.includes("linkedin") ||
+    m.includes("cover letter") ||
+    m.includes("email") ||
+    m.includes("recruiter")
+  ) {
+    return "Along with the resume prompts, you get a full LinkedIn Profile Optimization guide plus 10+ ready-made cover letter & cold email scripts to reach out directly to recruiters and hiring managers! ✉️";
+  }
+
+  // Downloads / Delivery
+  if (
+    m.includes("download") ||
+    m.includes("kaise mil") ||
+    m.includes("delivery") ||
+    m.includes("access")
+  ) {
+    return "Immediately after completing your ₹99 payment via Razorpay, you are redirected to your Dashboard to download all PDF and Word (.docx) files instantly! ⚡";
+  }
+
+  // AI Tools Compatibility
+  if (
+    m.includes("chatgpt") ||
+    m.includes("claude") ||
+    m.includes("gemini") ||
+    m.includes("grok") ||
+    m.includes("ai")
+  ) {
+    return "Our prompts are 100% tested and compatible with ChatGPT, Claude, Google Gemini, and Grok. Just copy the prompts from the PDF ebook, paste into your favorite AI tool, and get customized resume bullet points instantly! 🤖";
+  }
+
+  // Default specific response
+  return "The Prompt Resume Toolkit gives you a 52-page PDF ebook, 30+ copyable AI prompts, 3 ATS Word templates, LinkedIn guide, and cover letter scripts. You can get instant access for ₹99 today on the site! 🚀";
 }
