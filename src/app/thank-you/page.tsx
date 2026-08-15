@@ -21,20 +21,6 @@ export default function ThankYouRedirect() {
 
     // 2. Call verify payment API & unlock downloads
     fetch("/api/verify-payment", { method: "POST" }).catch(() => {});
-
-    // 3. Auto-redirect to dashboard after 4 seconds
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          router.push("/dashboard?paid=true");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, [router]);
 
   return (
@@ -60,18 +46,18 @@ export default function ThankYouRedirect() {
             Payment Successful!
           </h1>
           <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-            Thank you for purchasing The Prompt Resume Blueprint & Toolkit. Unlocking your downloads and redirecting to your Dashboard...
+            Thank you for purchasing The Prompt Resume Blueprint & Toolkit. Your access has been successfully unlocked!
           </p>
 
-          <div className="bg-blue-50 text-blue-600 px-4 py-2.5 rounded-lg text-xs font-semibold mb-5 border border-blue-200 flex items-center justify-center gap-2">
-            <span className="animate-spin text-sm">⏳</span> Redirecting to Dashboard in {countdown} seconds...
+          <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl text-xs font-medium mb-6 border border-green-200 leading-relaxed">
+            To download your 52-page PDF ebook and ATS Word templates, click the Dashboard button below.
           </div>
 
           <button
             onClick={() => router.push("/dashboard?paid=true")}
-            className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold py-3 px-4 rounded-full text-sm transition-all shadow-md cursor-pointer"
+            className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold py-3.5 px-4 rounded-full text-sm transition-all shadow-md cursor-pointer"
           >
-            Go to Dashboard Now →
+            Go to Dashboard to Download Files →
           </button>
         </div>
       </div>
