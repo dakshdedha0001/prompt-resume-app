@@ -22,18 +22,19 @@ export default function ThankYouRedirect() {
     // 2. Call verify payment API & unlock downloads
     fetch("/api/verify-payment", { method: "POST" }).catch(() => {});
 
-    // 3. Auto-redirect temporarily paused for Meta Pixel Event Setup
-    // const timer = setInterval(() => {
-    //   setCountdown((prev) => {
-    //     if (prev <= 1) {
-    //       clearInterval(timer);
-    //       router.push("/dashboard?paid=true");
-    //       return 0;
-    //     }
-    //     return prev - 1;
-    //   });
-    // }, 1000);
-    // return () => clearInterval(timer);
+    // 3. Auto-redirect to dashboard after 4 seconds
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push("/dashboard?paid=true");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [router]);
 
   return (
@@ -63,7 +64,7 @@ export default function ThankYouRedirect() {
           </p>
 
           <div className="bg-blue-50 text-blue-600 px-4 py-2.5 rounded-lg text-xs font-semibold mb-5 border border-blue-200 flex items-center justify-center gap-2">
-            <span>🎯</span> Auto-redirect paused for Event Setup. Click button when ready!
+            <span className="animate-spin text-sm">⏳</span> Redirecting to Dashboard in {countdown} seconds...
           </div>
 
           <button
